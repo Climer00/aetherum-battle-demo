@@ -2,7 +2,7 @@ state.hero.hp=Math.max(0,state.hero.hp-fd.total);
 state.hitFlash=12;state.shake=8;state.hero.pose="hurt";
 line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
 if(isShove){state.shovePenalty=1;log("Shove: −1 to hit until your turn ends.","warn");}
-showDiceTheater(atk,dmgText,callout);
+showDiceTheater(atk,dmgText,callout,dmg);
 if(state.hero.hp<=0){setTimeout(()=>{state.screen="lose";state.uiDirty=true;},900);state.uiDirty=true;return;}
 }else{
 line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);
@@ -34,7 +34,7 @@ const fd=fmtDmg(dmg,0);dmgText=fd.text;
 state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
 state.hitFlash=14;state.shake=8;state.enemy.pose="hurt";
 line+=" — HIT — "+fd.text+" dmg";if(usedSetup)line+=" (setup die)";log(line,"hit");
-showDiceTheater(atk,dmgText,callout);
+showDiceTheater(atk,dmgText,callout,dmg);
 if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},800);state.uiDirty=true;return;}
 }else{line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
 state.animTimer=35;state._riposteDone=true;state._afterEnemy=true;state.uiDirty=true;

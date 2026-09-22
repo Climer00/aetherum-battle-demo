@@ -32,9 +32,9 @@ let pips="";
 (dt.dmgVals||[]).forEach(v=>{
 let k=dt.dmgSides===6?("die_d6_"+Math.max(1,Math.min(6,v|0))):"die_d8";
 const s=pack[k]||"";
-if(s)pips+='<img class="dtPip" src="'+s+'" alt="'+v+'">';
+if(s)pips+='<span class="dtPipWrap"><img class="dtPip" src="'+s+'" alt="'+v+'">'+(dt.dmgSides!==6?'<em>'+v+'</em>':'')+'</span>';
 });
-const die=d20src?'<img class="dtD20img" src="'+d20src+'" alt="d20 '+dt.d20+'">':'<div class="dtDie" aria-hidden="true"><span>'+dt.d20+'</span></div>';
+const die=d20src?'<span class="dtDieWrap"><img class="dtD20img" src="'+d20src+'" alt="d20 '+dt.d20+'"><em>'+dt.d20+'</em></span>':'<div class="dtDie" aria-hidden="true"><span>'+dt.d20+'</span></div>';
 el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div class="dtDice">'+die+pips+'</div><div class="dtD20">d20 = '+dt.d20+'</div>'+(dt.dmg?'<div class="dtDmg">'+dt.dmg+'</div>':'');
 }else{el.diceTheater.classList.add("hidden");el.diceTheater.innerHTML="";}
 }
