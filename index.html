@@ -15,6 +15,13 @@
     <div id="stage">
       <canvas id="c" width="256" height="224" aria-label="Battle sprites"></canvas>
       <div id="overlayMsg" class="hidden"></div>
+      <div id="riposteAsk" class="hidden" role="dialog" aria-label="Riposte choice">
+        <p id="riposteAskText">Use Riposte (1 bank)?</p>
+        <div class="riposteAskBtns">
+          <button type="button" id="btnRiposteUse" class="btn danger">Use</button>
+          <button type="button" id="btnRiposteSkip" class="btn">Skip</button>
+        </div>
+      </div>
     </div>
     <section id="status" class="panel" aria-live="polite">
       <div class="stat"><span class="lbl">AP</span> <span id="statAp">—</span></div>
@@ -56,6 +63,8 @@
   <script src="sprites-brute-a-2.js"></script>
   <script src="sprites-brute-b-0.js"></script>
   <script src="sprites-brute-b-1.js"></script>
+  <script src="sprites-duelist_hurt.js"></script>
+  <script src="sprites-brute_hurt.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
