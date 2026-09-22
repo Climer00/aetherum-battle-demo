@@ -25,9 +25,11 @@ else{el.overlay.className="hidden";el.overlay.textContent="";}
 el.btnFight.classList.toggle("hidden",fighting||state.screen==="win"||state.screen==="lose");
 el.btnRestart.classList.toggle("hidden",state.screen!=="win"&&state.screen!=="lose");
 el.btnStrike.disabled=!player;el.btnEnd.disabled=!player;
-el.btnRiposte.classList.toggle("hidden",!ripWin);
+const ask=ripWin&&state.bank>=1&&state.riposteReady;
+el.btnRiposte.classList.toggle("hidden",!ripWin||ask);
 el.btnRiposte.disabled=!(ripWin&&state.bank>=1);
 el.btnRiposte.textContent=state.bank>=1?"Riposte (1 Bank)":"Riposte (no bank)";
+if(el.riposteAsk){el.riposteAsk.classList.toggle("hidden",!ask);}
 el.handHint.textContent=player?(state.selectedMod?" · mod: "+cardById(state.selectedMod).name:" · card or Strike"):(ripWin?" · Wind-Up!":"");
 el.hand.innerHTML="";
 DEFAULT_HAND.forEach(id=>{
@@ -45,3 +47,5 @@ el.btnRestart.addEventListener("click",()=>initFight());
 el.btnStrike.addEventListener("click",()=>doBasicStrike());
 el.btnEnd.addEventListener("click",()=>endPlayerTurn());
 el.btnRiposte.addEventListener("click",()=>doRiposte());
+if(el.btnRiposteUse)el.btnRiposteUse.addEventListener("click",()=>doRiposte());
+if(el.btnRiposteSkip)el.btnRiposteSkip.addEventListener("click",()=>skipRiposte());
