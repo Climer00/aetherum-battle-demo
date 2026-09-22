@@ -1,0 +1,57 @@
+{id:"spark",name:"Spark Edge",cost:1,type:"modifier",encounterOnce:true,hitBonus:2,dmgBonus:0,desc:"+2 to hit (ONCE)"},
+{id:"lunge",name:"Lunge",cost:2,type:"maneuver",encounterOnce:true,hitBonus:1,dmgBonus:2,desc:"Dash strike +dmg (ONCE)"},
+{id:"guard",name:"Guard",cost:1,type:"defense",acBonus:3,turns:1,desc:"+3 AC until next turn"},
+{id:"precise",name:"Precise Cut",cost:1,type:"modifier",hitBonus:1,dmgBonus:0,desc:"Strike mod +1 hit"},
+{id:"feint",name:"Feint",cost:1,type:"modifier",hitBonus:1,dmgBonus:0,desc:"Strike mod +1 hit"},
+{id:"sidestep",name:"Sidestep",cost:1,type:"defense",acBonus:2,turns:1,desc:"+2 AC / maneuver"},
+{id:"riposte_setup",name:"Riposte Setup",cost:1,type:"setup",desc:"Enable enhanced Riposte"},
+{id:"press",name:"Press",cost:2,type:"maneuver",hitBonus:0,dmgBonus:3,desc:"Heavy advance +3 dmg"},
+{id:"bind",name:"Bind",cost:1,type:"modifier",hitBonus:2,dmgBonus:0,desc:"Strike mod +2 hit"},
+{id:"challenge",name:"Challenge",cost:1,type:"maneuver",hitBonus:2,dmgBonus:0,desc:"Provoke: next hit +2"}
+];
+const DEFAULT_HAND=["spark","lunge","guard","precise","feint","sidestep","riposte_setup"];
+function cardById(id){return CARD_POOL.find(c=>c.id===id);}
+function d(n){return 1+Math.floor(Math.random()*n);}
+function roll(expr){
+const m=expr.match(/(\d+)d(\d+)([+-]\d+)?/);
+if(!m)return{total:0,rolls:[],mod:0,sides:0,n:0,expr};
+const n=+m[1],sides=+m[2],mod=m[3]?+m[3]:0;
+const rolls=[];for(let i=0;i<n;i++)rolls.push(d(sides));
+const sum=rolls.reduce((a,b)=>a+b,0);
+return{total:sum+mod,rolls,mod,sides,n,sum,expr};
+}
+function fmtD20(r){const modStr=r.mod>=0?"+"+r.mod:String(r.mod);return"d20="+r.rolls[0]+" "+modStr+" = "+r.total;}
+function fmtDmg(r,extra){
+extra=extra||0;let s=r.n+"d"+r.sides;
+if(r.mod)s+=(r.mod>=0?"+"+r.mod:r.mod);
+s+=" ["+r.rolls.join("+");
+if(r.mod)s+=(r.mod>=0?"+"+r.mod:r.mod);
+s+="]";if(extra)s+=" +"+extra;
+const total=r.total+extra;s+=" = "+total;return{text:s,total};
+}
+const state={
+screen:"title",phase:"player",ap:5,bank:0,selectedMod:null,
+hand:[],discardedOnce:new Set(),inHand:new Set(),
+hero:null,enemy:null,log:[],
+enemyPattern:0,enemyPhase:null,telegraph:null,
+riposteReady:false,riposteSetup:false,
+animTimer:0,hitFlash:0,shake:0,turn:0,
+uiDirty:true,_afterEnemy:false,_riposteDone:false
+};
+function log(msg,cls){state.log.push({text:msg,cls:cls||"sys"});if(state.log.length>40)state.log.shift();state.uiDirty=true;}
+function initFight(){
+state.screen="fight";state.phase="player";state.ap=5;state.bank=0;state.selectedMod=null;
+state.discardedOnce=new Set();state.hand=DEFAULT_HAND.slice();state.inHand=new Set(state.hand);
+state.riposteSetup=false;state.riposteReady=false;state.telegraph=null;
+state.enemyPattern=0;state.enemyPhase=null;state.turn=1;state.log=[];
+state.animTimer=0;state.hitFlash=0;state.shake=0;state._afterEnemy=false;state._riposteDone=false;
+state.hero={name:"Conductor Duelist",hp:42,maxHp:42,ac:14,baseAc:14,atkBonus:5,dmg:"1d8+2",tempAc:0,tempAcTurns:0,x:160,y:64,pose:"idle"};
+state.enemy={name:"Dock Brute",hp:58,maxHp:58,ac:15,atkBonus:4,x:40,y:60,pose:"idle"};
+log("Fight! Conductor vs Dock Brute.","sys");
+log("Your turn — 5 AP. Bank starts at 0; +2/turn from turn 2 (cap 4). Shortfall auto-pulls from bank.","sys");
+startPlayerTurn(true);state.uiDirty=true;
+}
+function startPlayerTurn(first){
+state.phase="player";state.selectedMod=null;if(!first)state.turn++;
+// First player turn of the fight: bank stays 0 (no +2 refresh). Refresh from turn 2 onward.
+if(!first){
