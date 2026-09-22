@@ -1,7 +1,52 @@
+state.hero.hp=Math.max(0,state.hero.hp-fd.total);
+state.hitFlash=12;state.shake=8;state.hero.pose="hurt";
+line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
+if(isShove){state.shovePenalty=1;log("Shove: −1 to hit until your turn ends.","warn");}
+showDiceTheater(atk,dmgText,callout);
+if(state.hero.hp<=0){setTimeout(()=>{state.screen="lose";state.uiDirty=true;},900);state.uiDirty=true;return;}
+}else{
+line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);
+if(isShove){state.shovePenalty=1;log("Shove still applies: −1 to hit.","warn");}
+}
+state.animTimer=40;state._afterEnemy=true;state.uiDirty=true;
+}
+function skipRiposte(){
+if(state.phase!=="riposte_window")return;
+state.riposteReady=false;state.animTimer=0;
+log("Riposte skipped (Setup stays armed).","sys");state.uiDirty=true;afterEnemyOrRiposte();
+}
+function doRiposte(){
+if(state.phase!=="riposte_window")return;
+if(state.bank<1){log("No banked AP!","warn");return;}
+state.bank-=1;state.riposteReady=false;state.phase="resolve";state.telegraph=null;
+state.hero.pose="riposte";state.animTimer=0;state.windupArmed=false;state.enemyPhase=null;voice("riposte");
+const usedSetup=!!state.riposteSetup;
+if(usedSetup)state.riposteSetup=false;
+const atk=rollAtkD20(state.hero.atkBonus+1);const nat=atk.nat;
+let callout=nat===20?"CRIT!":(nat===1?"FUMBLE!":"");
+let line="RIPOSTE (1 bank): "+fmtD20(atk)+" vs AC "+state.enemy.ac;let dmgText="";
+if(nat===1){line+=" — FUMBLE — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
+else if(atk.total>=state.enemy.ac||nat===20){
+let dmg=roll(state.hero.dmg);
+if(usedSetup){const ex=d(dmg.sides);dmg.rolls.push(ex);dmg.total+=ex;dmg.sum+=ex;dmg.n+=1;log("Setup: +1 dmg die = "+ex,"hit");}
+if(nat===20){const ex=d(dmg.sides);dmg.rolls.push(ex);dmg.total+=ex;dmg.sum+=ex;dmg.n+=1;}
+const fd=fmtDmg(dmg,0);dmgText=fd.text;
+state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
+state.hitFlash=14;state.shake=8;state.enemy.pose="hurt";
+line+=" — HIT — "+fd.text+" dmg";if(usedSetup)line+=" (setup die)";log(line,"hit");
+showDiceTheater(atk,dmgText,callout);
+if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},800);state.uiDirty=true;return;}
+}else{line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
+state.animTimer=35;state._riposteDone=true;state._afterEnemy=true;state.uiDirty=true;
+}
+function afterEnemyOrRiposte(){
 state.enemy.pose="idle";state.hero.pose="idle";state.telegraph=null;
 if(state.enemy.hp<=0||state.hero.hp<=0)return;
-if(state._riposteDone){state._riposteDone=false;state._afterEnemy=false;startPlayerTurn(false);return;}
-if(state.enemyPhase==="windup"){state.enemyPhase="heavy";state.enemy.pose="heavy_blow";log("Heavy Blow lands!","warn");enemyAttack("2d8+3","Heavy Blow");return;}
+if(state._riposteDone){state._riposteDone=false;state._afterEnemy=false;state.windupArmed=false;startPlayerTurn(false);return;}
+if(state.enemyPhase==="windup"||state.windupArmed){
+state.enemyPhase="heavy";state.windupArmed=false;state.enemy.pose="heavy_blow";
+log("Heavy Blow lands!","warn");enemyAttack("2d8+3","Heavy Blow",false);return;
+}
 if(state._afterEnemy){state._afterEnemy=false;startPlayerTurn(false);}
 state.uiDirty=true;
 }
@@ -14,38 +59,8 @@ el.ac.textContent=String(heroAc());el.turn.textContent=String(state.turn);
 el.riposte.textContent=state.riposteSetup?"Setup ON":"basic";
 el.mod.textContent=state.selectedMod?cardById(state.selectedMod).name:"none";
 }else{el.ap.textContent="—";el.bank.textContent="—";el.ac.textContent="—";el.turn.textContent="—";el.riposte.textContent="—";el.mod.textContent="none";}
-el.log.innerHTML="";
-state.log.forEach(entry=>{const div=document.createElement("div");div.className="line "+(entry.cls||"sys");div.textContent=entry.text;el.log.appendChild(div);});
-el.log.scrollTop=el.log.scrollHeight;
-if(state.screen==="title"){el.overlay.className="";el.overlay.textContent="Start Fight";}
-else if(state.screen==="win"){el.overlay.className="";el.overlay.textContent="VICTORY";}
-else if(state.screen==="lose"){el.overlay.className="lose";el.overlay.textContent="DEFEAT";}
-else if(state.telegraph){el.overlay.className="";el.overlay.textContent=state.telegraph;}
-else{el.overlay.className="hidden";el.overlay.textContent="";}
-el.btnFight.classList.toggle("hidden",fighting||state.screen==="win"||state.screen==="lose");
-el.btnRestart.classList.toggle("hidden",state.screen!=="win"&&state.screen!=="lose");
-el.btnStrike.disabled=!player;el.btnEnd.disabled=!player;
-const ask=ripWin&&state.bank>=1&&state.riposteReady;
-el.btnRiposte.classList.toggle("hidden",!ripWin||ask);
-el.btnRiposte.disabled=!(ripWin&&state.bank>=1);
-el.btnRiposte.textContent=state.bank>=1?"Riposte (1 Bank)":"Riposte (no bank)";
-if(el.riposteAsk){el.riposteAsk.classList.toggle("hidden",!ask);}
-el.handHint.textContent=player?(state.selectedMod?" · mod: "+cardById(state.selectedMod).name:" · card or Strike"):(ripWin?" · Wind-Up!":"");
-el.hand.innerHTML="";
-DEFAULT_HAND.forEach(id=>{
-const c=cardById(id);const inHand=state.inHand.has(id);const onceGone=state.discardedOnce.has(id);const sel=state.selectedMod===id;
-const btn=document.createElement("button");btn.type="button";
-btn.className="card"+(sel?" selected":"")+(onceGone?" once-gone":"");
-btn.disabled=!player||!inHand;
-const onceBadge=c.encounterOnce?'\u003cspan class="badge-once">'+(onceGone?"USED":"ONCE")+"\u003c/span>":"";
-btn.innerHTML='\u003cdiv class="cname">'+c.name+onceBadge+"\u003c/div>"+'\u003cdiv class="cmeta">'+c.cost+" AP · "+c.type+"\u003c/div>"+'\u003cdiv class="ctype">'+(inHand?"in hand":(onceGone?"once-used":"next turn"))+"\u003c/div>"+'\u003cdiv class="cdesc">'+c.desc+"\u003c/div>";
-btn.addEventListener("click",()=>playCard(id));el.hand.appendChild(btn);
-});
-}
-el.btnFight.addEventListener("click",()=>initFight());
-el.btnRestart.addEventListener("click",()=>initFight());
-el.btnStrike.addEventListener("click",()=>doBasicStrike());
-el.btnEnd.addEventListener("click",()=>endPlayerTurn());
-el.btnRiposte.addEventListener("click",()=>doRiposte());
-if(el.btnRiposteUse)el.btnRiposteUse.addEventListener("click",()=>doRiposte());
-if(el.btnRiposteSkip)el.btnRiposteSkip.addEventListener("click",()=>skipRiposte());
+if(el.sheetPeek){
+if(state.hero&&state.enemy){
+el.sheetPeek.innerHTML='<div class="peekHero"><b>Hero</b> HP '+state.hero.hp+'/'+state.hero.maxHp+' · AC '+heroAc()+' · Atk +'+state.hero.atkBonus+' · '+state.hero.dmg+'</div>'+
+'<div class="peekEnemy"><b>Brute</b> HP '+state.enemy.hp+'/'+state.enemy.maxHp+' · AC '+state.enemy.ac+' · Atk +'+state.enemy.atkBonus+'</div>';
+el.sheetPeek.classList.remove("hidden");
