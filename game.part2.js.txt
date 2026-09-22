@@ -1,5 +1,23 @@
+state.diceTheater=null;state.feintArmed=false;state.sidestepArmed=false;state.guardTurns=0;
+state.shovePenalty=0;state.windupArmed=false;state.cover=null;
+state.hero={name:"Conductor Duelist",hp:42,maxHp:42,ac:14,baseAc:14,atkBonus:5,dmg:"1d8+2",tempAc:0,tempAcTurns:0,x:160,y:64,pose:"idle"};
+state.enemy={name:"Dock Brute",hp:58,maxHp:58,ac:15,atkBonus:4,x:40,y:60,pose:"idle"};
+log("Fight! Conductor vs Dock Brute.","sys");
+log("Bank starts at 0; leftover AP banks on End Turn (cap 4). Spends bank first, then AP.","sys");
+const hi=rollAtkD20(state.hero.atkBonus);const ei=rollAtkD20(2);
+state.initHero=hi.total;state.initEnemy=ei.total;
+log("Initiative — Hero: "+fmtD20(hi),"sys");
+log("Initiative — Brute: "+fmtD20(ei),"sys");
+if(state.initEnemy>state.initHero){
+log("Brute wins initiative.","warn");state.phase="enemy";state.uiDirty=true;
+setTimeout(()=>beginEnemyTurn(),400);
+}else{log("You win initiative.","sys");startPlayerTurn(true);}
+state.uiDirty=true;
+}
+function startPlayerTurn(first){
+state.phase="player";state.selectedMod=null;if(!first)state.turn++;
 state.ap=5;
-if(state.hero.tempAcTurns>0){state.hero.tempAcTurns--;if(state.hero.tempAcTurns<=0){state.hero.tempAc=0;state.hero.ac=state.hero.baseAc;log("Guard/Sidestep fades.","sys");}}
+if(state.guardTurns>0){state.guardTurns--;if(state.guardTurns<=0){state.hero.tempAc=0;log("Guard fades.","sys");}}
 for(const id of DEFAULT_HAND){if(state.discardedOnce.has(id))continue;if(!state.inHand.has(id)){state.hand.push(id);state.inHand.add(id);}}
 state.hand=DEFAULT_HAND.filter(id=>state.inHand.has(id));
 if(!first)log("— Turn "+state.turn+": "+state.ap+" AP —","sys");
@@ -19,7 +37,9 @@ function endPlayerTurn(){
 if(state.ap>0){const room=4-state.bank;const banked=Math.min(room,state.ap);
 if(banked>0){state.bank+=banked;log("Banked "+banked+" → "+state.bank+"/4","sys");}
 if(state.ap>banked)log((state.ap-banked)+" AP lost (full).","warn");}
-state.ap=0;state.selectedMod=null;state.uiDirty=true;beginEnemyTurn();
+state.ap=0;state.selectedMod=null;
+if(state.shovePenalty){state.shovePenalty=0;log("Shove penalty clears.","sys");}
+state.uiDirty=true;beginEnemyTurn();
 }
 function heroAc(){return state.hero.baseAc+(state.hero.tempAc||0);}
 function playCard(id){
@@ -31,10 +51,20 @@ if(state.selectedMod===id){state.selectedMod=null;log("Modifier cleared.","sys")
 else{state.selectedMod=id;log(c.name+" ready","sys");}
 state.uiDirty=true;return;
 }
-if(!spendAp(c.cost))return;removeFromHand(id,c);
-if(c.type==="defense"){state.hero.pose=(c.id==="sidestep")?"sidestep":"guard";state.hero.tempAc=Math.max(state.hero.tempAc||0,c.acBonus);state.hero.tempAcTurns=c.turns;log(c.name+": +"+c.acBonus+" AC (now "+heroAc()+").","sys");state.animTimer=Math.max(state.animTimer,28);}
-else if(c.type==="setup"){state.hero.pose="riposte_setup";state.riposteSetup=true;log("Riposte Setup armed.","warn");state.animTimer=Math.max(state.animTimer,28);}
-else if(c.type==="maneuver"){resolveHeroAttack(c);}
+if(!spendAp(c.cost))return;removeFromHand(id,c);voice(c.id);
+if(c.id==="guard"){
+state.hero.pose="guard";state.hero.tempAc=2;state.guardTurns=1;
+log("Guard: +2 armor (AC "+heroAc()+").","sys");state.animTimer=Math.max(state.animTimer,28);
+}else if(c.id==="sidestep"){
+state.hero.pose="sidestep";state.sidestepArmed=true;
+log("Sidestep: next attack vs you −2.","sys");state.animTimer=Math.max(state.animTimer,28);
+}else if(c.id==="feint"){
+state.hero.pose="feint";state.feintArmed=true;
+log("Feint armed: next Strike +1 to hit.","sys");state.animTimer=Math.max(state.animTimer,28);
+}else if(c.id==="riposte_setup"){
+state.hero.pose="riposte_setup";state.riposteSetup=true;
+log("Riposte Setup armed (+1 dmg die on Use).","warn");state.animTimer=Math.max(state.animTimer,28);
+}else if(c.type==="maneuver"){resolveHeroAttack(c);}
 state.uiDirty=true;
 }
 function removeFromHand(id,c){
@@ -46,17 +76,3 @@ function doBasicStrike(){
 if(state.phase!=="player")return;
 const mod=state.selectedMod?cardById(state.selectedMod):null;
 const cost=1+(mod?mod.cost:0);
-if(totalAp()<cost){log("Need "+cost+" AP (strike"+(mod?" + "+mod.name:"")+") — have "+state.ap+" AP + "+state.bank+" bank.","warn");return;}
-if(!spendAp(cost))return;
-if(mod){removeFromHand(mod.id,mod);state.selectedMod=null;}
-resolveHeroAttack(mod);
-}
-function resolveHeroAttack(mod){
-state.phase="resolve";
-if(mod&&mod.id==="lunge")state.hero.pose="lunge";
-else if(mod&&mod.id==="spark")state.hero.pose="spark_edge";
-else if(mod&&mod.id==="precise")state.hero.pose="precise_cut";
-else if(mod&&mod.id==="feint")state.hero.pose="feint";
-else if(mod&&mod.type==="maneuver")state.hero.pose="attack";
-else state.hero.pose="basic_strike";
-const hitB=(mod&&mod.hitBonus)||0;const dmgB=(mod&&mod.dmgBonus)||0;
