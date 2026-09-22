@@ -48,7 +48,7 @@ state.animTimer=0;state.hitFlash=0;state.shake=0;state._afterEnemy=false;state._
 state.hero={name:"Conductor Duelist",hp:42,maxHp:42,ac:14,baseAc:14,atkBonus:5,dmg:"1d8+2",tempAc:0,tempAcTurns:0,x:160,y:64,pose:"idle"};
 state.enemy={name:"Dock Brute",hp:58,maxHp:58,ac:15,atkBonus:4,x:40,y:60,pose:"idle"};
 log("Fight! Conductor vs Dock Brute.","sys");
-log("Your turn — 5 AP. Bank starts at 0; leftover AP banks on End Turn (cap 4). Shortfall auto-pulls from bank.","sys");
+log("Your turn — 5 AP. Bank starts at 0; leftover AP banks on End Turn (cap 4). Spends bank first, then AP.","sys");
 startPlayerTurn(true);state.uiDirty=true;
 }
 function startPlayerTurn(first){
