@@ -59,3 +59,14 @@ el.btnEnd.addEventListener("click",()=>endPlayerTurn());
 el.btnRiposte.addEventListener("click",()=>doRiposte());
 if(el.btnRiposteUse)el.btnRiposteUse.addEventListener("click",()=>doRiposte());
 if(el.btnRiposteSkip)el.btnRiposteSkip.addEventListener("click",()=>skipRiposte());
+function setCover(v){
+state.cover=v||null;
+["coverNone","coverHalf","coverFull"].forEach(k=>{if(el[k])el[k].classList.remove("active");});
+const id=!v?"coverNone":(v==="half"?"coverHalf":"coverFull");
+if(el[id])el[id].classList.add("active");
+log(v?"Cover set: "+v+" ("+coverMod()+" to attacks vs you).":"Cover cleared.","sys");
+state.uiDirty=true;
+}
+if(el.coverNone)el.coverNone.addEventListener("click",()=>setCover(null));
+if(el.coverHalf)el.coverHalf.addEventListener("click",()=>setCover("half"));
+if(el.coverFull)el.coverFull.addEventListener("click",()=>setCover("full"));
