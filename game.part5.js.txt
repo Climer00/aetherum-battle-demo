@@ -24,7 +24,18 @@ if(el.diceTheater){
 const dt=state.diceTheater;
 if(dt&&dt.frames>0){
 el.diceTheater.classList.remove("hidden");
-el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div class="dtDie" aria-hidden="true"><span>'+dt.d20+'</span></div><div class="dtD20">d20 = '+dt.d20+'</div>'+(dt.dmg?'<div class="dtDmg">'+dt.dmg+'</div>':'');
+const pack=window.AETHERUM_SPRITES||{};
+const nat=dt.nat!=null?dt.nat:+dt.d20;
+const d20k=nat===20?"die_d20_crit":(nat===1?"die_d20_fumble":"die_d20");
+const d20src=pack[d20k]||"";
+let pips="";
+(dt.dmgVals||[]).forEach(v=>{
+let k=dt.dmgSides===6?("die_d6_"+Math.max(1,Math.min(6,v|0))):"die_d8";
+const s=pack[k]||"";
+if(s)pips+='<img class="dtPip" src="'+s+'" alt="'+v+'">';
+});
+const die=d20src?'<img class="dtD20img" src="'+d20src+'" alt="d20 '+dt.d20+'">':'<div class="dtDie" aria-hidden="true"><span>'+dt.d20+'</span></div>';
+el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div class="dtDice">'+die+pips+'</div><div class="dtD20">d20 = '+dt.d20+'</div>'+(dt.dmg?'<div class="dtDmg">'+dt.dmg+'</div>':'');
 }else{el.diceTheater.classList.add("hidden");el.diceTheater.innerHTML="";}
 }
 if(state.screen==="title"){el.overlay.className="";el.overlay.textContent="Start Fight";}

@@ -1,0 +1,15 @@
+#diceTheater .dtDice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+#diceTheater .dtD20img,
+#diceTheater .dtPip {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  display: block;
+}
+#diceTheater .dtD20img { width: 56px; height: 56px; }
+#diceTheater .dtPip { width: 32px; height: 32px; }
