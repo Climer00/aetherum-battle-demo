@@ -14,6 +14,9 @@ https://raw.githack.com/Climer00/aetherum-battle-demo/fde0fb964a3351b12205538457
 **Tabletop pack + Guard chip wired:**
 https://raw.githack.com/Climer00/aetherum-battle-demo/94ac3566df6f5d43b236088dc00af753cc49cb18/index.html
 
+**Cover toggle + Feint v4 valid part-join (this drop):**
+Use the latest main commit SHA after the Feint-encode drop (prefer that pin over `/main/`).
+
 Clone and open `index.html` (needs a local server — `game.js` fetches `game.part0.js.txt` … `game.part6.js.txt`).
 
 ## How to play
@@ -59,7 +62,7 @@ Club → Wind-Up → Heavy; occasional Shove.
 - **Wind-Up** — next Brute attack is Heavy; clears on that swing
 - **Shove** — target −1 to hit until their next turn end
 
-Approved chip art: Guard v3 48×48 emblem is wired and valid. Feint v3 parts are in-repo but the joined PNG stream is corrupt — text badge until a re-encode is glance-approved. Other chips stay text-only.
+Approved chip art: Guard v3 and Feint v4 (48×48) are wired via part-join and decode as valid PNGs. Sidestep / Riposte Setup / Wind-Up / Shove art is glance-approved but **held from wiring**. Cover test toggle (None / Half −1 / Full −2) is live and applies only to attacks vs the hero.
 
 ## Tech
 
