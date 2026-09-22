@@ -84,7 +84,10 @@ btnRiposte:document.getElementById("btnRiposte"),
 riposteAsk:document.getElementById("riposteAsk"),
 btnRiposteUse:document.getElementById("btnRiposteUse"),
 btnRiposteSkip:document.getElementById("btnRiposteSkip"),
-btnRestart:document.getElementById("btnRestart")
+btnRestart:document.getElementById("btnRestart"),
+coverNone:document.getElementById("coverNone"),
+coverHalf:document.getElementById("coverHalf"),
+coverFull:document.getElementById("coverFull")
 };
 function fit(){
 const maxW=Math.min(window.innerWidth-24,720);

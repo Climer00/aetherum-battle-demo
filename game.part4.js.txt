@@ -61,6 +61,7 @@ el.mod.textContent=state.selectedMod?cardById(state.selectedMod).name:"none";
 }else{el.ap.textContent="—";el.bank.textContent="—";el.ac.textContent="—";el.turn.textContent="—";el.riposte.textContent="—";el.mod.textContent="none";}
 if(el.sheetPeek){
 if(state.hero&&state.enemy){
-el.sheetPeek.innerHTML='<div class="peekHero"><b>Hero</b> HP '+state.hero.hp+'/'+state.hero.maxHp+' · AC '+heroAc()+' · Atk +'+state.hero.atkBonus+' · '+state.hero.dmg+'</div>'+
+const cov=state.cover?(" · Cover "+state.cover+" ("+coverMod()+" vs you)"):" · Cover none";
+el.sheetPeek.innerHTML='<div class="peekHero"><b>Hero</b> HP '+state.hero.hp+'/'+state.hero.maxHp+' · AC '+heroAc()+' · Atk +'+state.hero.atkBonus+' · '+state.hero.dmg+cov+'</div>'+
 '<div class="peekEnemy"><b>Brute</b> HP '+state.enemy.hp+'/'+state.enemy.maxHp+' · AC '+state.enemy.ac+' · Atk +'+state.enemy.atkBonus+'</div>';
 el.sheetPeek.classList.remove("hidden");

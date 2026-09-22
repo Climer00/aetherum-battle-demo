@@ -58,8 +58,10 @@ state.phase="resolve";state.windupArmed=false;state.telegraph=null;
 let ac=heroAc();
 if(state.sidestepArmed){ac+=2;state.sidestepArmed=false;log("Sidestep: −2 to their attack (consumed).","sys");}
 const atk=rollAtkD20(state.enemy.atkBonus);const nat=atk.nat;
+const cm=coverMod();
+if(cm){atk.total+=cm;log("Cover "+state.cover+": "+cm+" to Brute hit.","sys");}
 let callout=nat===20?"CRIT!":(nat===1?"FUMBLE!":"");
-let line=name+": "+fmtD20(atk)+" vs AC "+ac;let dmgText="";
+let line=name+": "+fmtD20(atk)+(cm?" cover "+cm:"")+" vs AC "+ac;let dmgText="";
 if(nat===1){line+=" — FUMBLE — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
 else if(atk.total>=ac||nat===20){
 let dmg=roll(dmgExpr);
