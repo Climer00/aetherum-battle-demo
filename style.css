@@ -300,6 +300,24 @@ canvas#c {
   letter-spacing: 0.06em;
   text-shadow: 0 0 8px rgba(212,160,23,0.5);
 }
+#diceTheater .dtDie {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1a1030;
+  border: 2px solid #d4a017;
+  transform: rotate(45deg);
+  box-shadow: 0 0 12px rgba(212,160,23,0.35);
+}
+#diceTheater .dtDie span {
+  transform: rotate(-45deg);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #5eead4;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
 #diceTheater .dtD20 {
   font-size: 1.25rem;
   font-weight: 700;
