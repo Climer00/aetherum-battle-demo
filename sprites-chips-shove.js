@@ -1,0 +1,28 @@
+window.AETHERUM_SPRITES=window.AETHERUM_SPRITES||{};
+// chip_shove q32 sha16=e27203366443d707 bytes=1281
+window.AETHERUM_SPRITES['chip_shove']='data:image/png;base64,'+[
+  'iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAYFBMVEWrjGFpX0eVd1EeT08d',
+  'HyBHLBfKpXHqzJ1uWT0uQzzUtIcIOkIzjYtLoJuHYj5ChnwAAAAWFRQJCAgxJRZrSS4qKCRL',
+  'OSdURTElGhB0VDczNSwLKSwRNTeMakdLMxyEWTi5Ake6AAAAIHRSTlP/////////////////',
+  '////AP///////////////////3wvzbcAAAQwSURBVHjalZaLetwoDIUBX2YmabvBCAmBsd//',
+  'LfcIJ023SbO7/nKZsfmRdHTB7uV/Xu7jre9TXPr00BQf078DwU/fvk/74WXZv33/NvnwJaAz',
+  '9e6naaqdyz5N3v+gsvwRWLXGxEs62q7nUvd2LAunmKl/DgTGnrVsUZN0XzlViltJdd/r+RnQ',
+  '8z55eFLKeZ7+r4mP84ylLOqn50ofgZ6xXMuGqyyHTBP8ub4RkKq/A6rehwOP47XI1+Najt/l',
+  '9F75n8DZKvUFD7lGXFs5bXv8x1dQJ+VGvwLDn4QVcw4pZ47bsmwxpujzxcOrV8K96WP7Fzx0',
+  'oWafZ8Axsq4xvlr0r1oNgNrUjy2WWPPsby47yXlmZncLW84txrItOjV+A3qdPMF/ERDeOZF7',
+  'zlnEratEyTEJ4iB5HlIZQM/TiXzFOQQV8VW4QOC5dnHi6iYuWfj62PkCen02AzHnCB+w3D0d',
+  'oktKxcyVcOMRxkG7mQBw7tOPYgIpZ+drTeICi6TC2YjbHVtlmKBqQgGQHQYi7lYsrOGW5h4C',
+  '6ZEKZAWRbD1MkJhPboR8GFAzDCRdg+/OKXMyIq/d8vLmEwGAR2faku2DR6VwcDcXfpAMQHsR',
+  'rULIZaJ9N4B20yhJcKFzVdxf3dPq7peJDJPr2q1CItULaJPC4lzd6vNx5ySkIPqriYp08JVu',
+  'RM0G+LvFXPKsocJwOiBqWBEFgBKzOm6IuljuHmJAJ8tCmue5wtO4JLQDBadixNAiD103Vm8W',
+  'ODGNUsveZw/vjgSrAqGUDkPw0XyCBS4DQCvAgLjbKvnQborh0vDkDriEnyo1JyBvMUBdbC8+',
+  'hJ5LEQ9PUkxHd3Inhg22RknFVGqXrLsmcwlQxYYl2W7lkPR0QzECYQsN7UTtkhXqjkznrGRP',
+  'rDUjMLnfbs5rYTFZvR7UUH3uRXmXUUtRVs01Wbts8DwpBxBBEXeEVcS8iwFXEEagz1D7MW2j',
+  'WQur9Kebh0cjh1eiR3njw2LtMM9JnQa2Hi7bgZST8z30zjZ7kmKCDkClMY2g0UErypkgIjyj',
+  'A4opvDKTloUml4UXhVzLiOJ+U9bqSKDjBl843Z0zCVCd5zBw9bQgCmvq4mQT5rAKlmMN/mrY',
+  'jCzxhAH9OWaQwjE2+OrsFcpH3uDYDDmYlDei9tD3uUR7IyxIcZSZ05rydgylYJg7b3zmpvQ+',
+  'KkmaEWN/TEtEYxVltY57bOtTk/PXYYwuVBg2qZCPDZhN1pESiMynl7eB/3PcE6dRGQXDcbYx',
+  'gRDKmPi2v4j+fqBQRhx6ZRlWxpQfCYi42xp9PLKQv4ZqKKOZRg+P04RPmufH+dmhSFJbJqU8',
+  'DqFxJcHXtsv5+bFLWoGwnkpIH+Q/cfLMbffnHw92QgpbqyzUlYjBo3/PL18dCLNkBxR8nFt7',
+  'vKvzxcsJARKpVVDe/+lt5uvrbx4roKf4bnGYAAAAAElFTkSuQmCC'
+].join('');
