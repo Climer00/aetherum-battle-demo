@@ -1,0 +1,64 @@
+const before=state.bank;state.bank=Math.min(4,state.bank+2);
+if(state.bank>before)log("Bank +"+(state.bank-before)+" (bank "+state.bank+"/4).","sys");
+}
+state.ap=5;
+if(state.hero.tempAcTurns>0){state.hero.tempAcTurns--;if(state.hero.tempAcTurns<=0){state.hero.tempAc=0;state.hero.ac=state.hero.baseAc;log("Guard/Sidestep fades.","sys");}}
+for(const id of DEFAULT_HAND){if(state.discardedOnce.has(id))continue;if(!state.inHand.has(id)){state.hand.push(id);state.inHand.add(id);}}
+state.hand=DEFAULT_HAND.filter(id=>state.inHand.has(id));
+if(!first)log("— Turn "+state.turn+": "+state.ap+" AP —","sys");
+state.uiDirty=true;
+}
+function totalAp(){return state.ap+state.bank;}
+function spendAp(n){
+if(totalAp()<n)return false;
+const fromAp=Math.min(state.ap,n);
+state.ap-=fromAp;
+const fromBank=n-fromAp;
+if(fromBank>0){state.bank-=fromBank;log("Spent "+fromAp+" AP + "+fromBank+" bank (AP "+state.ap+"/5, bank "+state.bank+"/4).","sys");}
+state.uiDirty=true;return true;
+}
+function endPlayerTurn(){
+if(state.ap>0){const room=4-state.bank;const banked=Math.min(room,state.ap);
+if(banked>0){state.bank+=banked;log("Banked "+banked+" → "+state.bank+"/4","sys");}
+if(state.ap>banked)log((state.ap-banked)+" AP lost (full).","warn");}
+state.ap=0;state.selectedMod=null;state.uiDirty=true;beginEnemyTurn();
+}
+function heroAc(){return state.hero.baseAc+(state.hero.tempAc||0);}
+function playCard(id){
+if(state.phase!=="player")return;const c=cardById(id);
+if(!c||!state.inHand.has(id))return;
+if(totalAp()<c.cost){log("Need "+c.cost+" AP for "+c.name+" (have "+state.ap+" AP + "+state.bank+" bank).","warn");return;}
+if(c.type==="modifier"){
+if(state.selectedMod===id){state.selectedMod=null;log("Modifier cleared.","sys");}
+else{state.selectedMod=id;log(c.name+" ready","sys");}
+state.uiDirty=true;return;
+}
+if(!spendAp(c.cost))return;removeFromHand(id,c);
+if(c.type==="defense"){state.hero.pose=(c.id==="sidestep")?"sidestep":"guard";state.hero.tempAc=Math.max(state.hero.tempAc||0,c.acBonus);state.hero.tempAcTurns=c.turns;log(c.name+": +"+c.acBonus+" AC (now "+heroAc()+").","sys");state.animTimer=Math.max(state.animTimer,28);}
+else if(c.type==="setup"){state.hero.pose="riposte_setup";state.riposteSetup=true;log("Riposte Setup armed.","warn");state.animTimer=Math.max(state.animTimer,28);}
+else if(c.type==="maneuver"){resolveHeroAttack(c);}
+state.uiDirty=true;
+}
+function removeFromHand(id,c){
+state.inHand.delete(id);state.hand=state.hand.filter(x=>x!==id);
+if(c&&c.encounterOnce){state.discardedOnce.add(id);log(c.name+" — ONCE (discarded).","warn");}
+state.uiDirty=true;
+}
+function doBasicStrike(){
+if(state.phase!=="player")return;
+const mod=state.selectedMod?cardById(state.selectedMod):null;
+const cost=1+(mod?mod.cost:0);
+if(totalAp()<cost){log("Need "+cost+" AP (strike"+(mod?" + "+mod.name:"")+") — have "+state.ap+" AP + "+state.bank+" bank.","warn");return;}
+if(!spendAp(cost))return;
+if(mod){removeFromHand(mod.id,mod);state.selectedMod=null;}
+resolveHeroAttack(mod);
+}
+function resolveHeroAttack(mod){
+state.phase="resolve";
+if(mod&&mod.id==="lunge")state.hero.pose="lunge";
+else if(mod&&mod.id==="spark")state.hero.pose="spark_edge";
+else if(mod&&mod.id==="precise")state.hero.pose="precise_cut";
+else if(mod&&mod.id==="feint")state.hero.pose="feint";
+else if(mod&&mod.type==="maneuver")state.hero.pose="attack";
+else state.hero.pose="basic_strike";
+const hitB=(mod&&mod.hitBonus)||0;const dmgB=(mod&&mod.dmgBonus)||0;
