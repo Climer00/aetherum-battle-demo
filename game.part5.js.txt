@@ -1,0 +1,54 @@
+canvas.addEventListener("click",()=>{if(state.screen==="title"||state.screen==="win"||state.screen==="lose")initFight();});
+function fill(c){ctx.fillStyle=c;}
+function rect(x,y,w,h,c){if(c)fill(c);ctx.fillRect(x|0,y|0,w|0,h|0);}
+function drawHeroFallback(hx,hy){
+const flash=state.hitFlash>0&&state.hero&&state.hero.pose==="hurt";
+rect(hx+10,hy+10,12,14,flash?P.redLt:P.navy);rect(hx+11,hy+12,10,3,P.copper);rect(hx+14,hy+16,4,6,P.aether);
+rect(hx+12,hy+4,8,7,P.skin);rect(hx+12,hy+3,8,2,P.dark);rect(hx+8,hy+10,3,12,P.mid);
+rect(hx+11,hy+24,4,8,P.dark);rect(hx+17,hy+24,4,8,P.dark);rect(hx+22,hy+8,2,18,P.gray);
+rect(hx+21,hy+7,4,2,P.copperLt);rect(hx+22,hy+6,2,2,P.white);
+}
+function drawBruteFallback(ex,ey){
+const flash=state.hitFlash>0&&state.enemy&&state.enemy.pose==="hurt";
+const wind=state.enemy&&state.enemy.pose==="windup";
+rect(ex+4,ey+10,24,18,flash?P.redLt:P.brute);rect(ex+6,ey+12,20,4,P.brown);
+rect(ex+10,ey+2,12,10,P.skin);rect(ex+10,ey+1,12,3,P.brown);
+const ax=wind?ex+28:ex+26;rect(ex-2,ey+12,8,6,P.bruteLt);rect(ax,ey+(wind?4:12),8,6,P.bruteLt);
+rect(ax+6,ey+(wind?-4:6),4,16,P.brown);rect(ax+4,ey+(wind?-8:2),8,6,P.brown);
+rect(ex+8,ey+28,6,6,P.dark);rect(ex+18,ey+28,6,6,P.dark);
+}
+function drawHero(hx,hy){
+const pose=state.hero?state.hero.pose:"idle";
+const flash=state.hitFlash>0&&pose==="hurt";
+const img=sprites[heroSpriteKey(pose)];
+if(!drawSprite(img,hx,hy,flash))drawHeroFallback(hx,hy);
+}
+function drawBrute(ex,ey){
+const pose=state.enemy?state.enemy.pose:"idle";
+const flash=state.hitFlash>0&&pose==="hurt";
+const img=sprites[bruteSpriteKey(pose)];
+if(!drawSprite(img,ex,ey,flash))drawBruteFallback(ex,ey);
+}
+function drawHpBar(x,y,w,hp,max){rect(x,y,w,5,P.black);const pct=Math.max(0,hp/max);rect(x+1,y+1,Math.floor((w-2)*pct),3,pct>0.3?P.green:P.red);}
+function drawFightSprites(){
+rect(0,0,W,H,P.dark);rect(0,110,W,50,P.navy);for(let i=0;i<16;i++)rect(i*16,110,1,50,P.blue);rect(0,0,W,16,P.black);
+const ox=state.shake>0?((Math.random()*3)|0)-1:0;const oy=state.shake>0?((Math.random()*3)|0)-1:0;
+if(state.enemy)drawBrute(state.enemy.x+ox,state.enemy.y+oy);
+if(state.hero)drawHero(state.hero.x+ox,state.hero.y+oy);
+if(state.enemy)drawHpBar(8,10,70,state.enemy.hp,state.enemy.maxHp);
+if(state.hero)drawHpBar(168,10,70,state.hero.hp,state.hero.maxHp);
+rect(8,18,4,4,P.bruteLt);rect(168,18,4,4,P.aether);
+}
+function drawIdleBg(){rect(0,0,W,H,P.black);rect(0,80,W,80,P.dark);drawBrute(40,60);drawHero(160,64);}
+function tick(){
+if(state.hitFlash>0)state.hitFlash--;if(state.shake>0)state.shake--;
+if(state.animTimer>0){state.animTimer--;if(state.animTimer===0){
+if(state.phase==="resolve"){if(state._afterEnemy||state._riposteDone)afterEnemyOrRiposte();else afterResolve();}
+else if(state.phase==="riposte_window"){state.riposteReady=false;afterEnemyOrRiposte();}
+else if(state.phase==="player"&&state.hero){state.hero.pose="idle";}
+state.uiDirty=true;}}
+if(state.screen==="fight")drawFightSprites();else drawIdleBg();
+syncUI();requestAnimationFrame(tick);
+}
+state.screen="title";state.uiDirty=true;loadSprites(()=>{});tick();
+})();
