@@ -23,8 +23,9 @@ const act=PATTERN[state.enemyPattern%PATTERN.length];
 state.enemyPattern++;state.enemyPhase=act;
 if(act==="windup"){
 state.telegraph="WIND-UP!";state.enemy.pose="windup";log("Dock Brute Wind-Up!","warn");
-state.riposteReady=state.bank>=1;state.phase="riposte_window";state.animTimer=90;
-if(state.riposteReady)log(">>> RIPOSTE available (1 bank) <<<","warn");else log("(Need bank for Riposte.)","sys");
+state.riposteReady=state.bank>=1;state.phase="riposte_window";
+if(state.riposteReady){state.animTimer=0;log(">>> RIPOSTE available (1 bank) — choose Use or Skip <<<","warn");}
+else{state.animTimer=90;log("(Need bank for Riposte.)","sys");}
 }else if(act==="club"){state.telegraph=null;state.enemy.pose="club";log("Dock Brute swings Club!","sys");enemyAttack("1d8+3","Club");}
 else if(act==="heavy"){state.telegraph=null;state.enemy.pose="attack";log("Dock Brute Heavy Blow!","warn");enemyAttack("2d8+3","Heavy Blow");}
 else if(act==="shove"){state.telegraph=null;state.enemy.pose="shove";log("Dock Brute Shoves!","sys");enemyAttack("1d6+2","Shove");}
@@ -43,10 +44,14 @@ if(state.hero.hp<=0){setTimeout(()=>{state.screen="lose";state.uiDirty=true;},90
 }else{line+=" — MISS";log(line,"miss");}
 state.animTimer=40;state._afterEnemy=true;state.uiDirty=true;
 }
+function skipRiposte(){
+if(state.phase!=="riposte_window")return;
+state.riposteReady=false;state.animTimer=0;log("Riposte skipped.","sys");state.uiDirty=true;afterEnemyOrRiposte();
+}
 function doRiposte(){
 if(state.phase!=="riposte_window")return;
 if(state.bank<1){log("No banked AP!","warn");return;}
-state.bank-=1;state.riposteReady=false;state.phase="resolve";state.telegraph=null;state.hero.pose="riposte";
+state.bank-=1;state.riposteReady=false;state.phase="resolve";state.telegraph=null;state.hero.pose="riposte";state.animTimer=0;
 const bonus=state.riposteSetup?3:1;const dmgB=state.riposteSetup?2:0;
 const atk=roll("1d20+"+(state.hero.atkBonus+bonus));
 let line="RIPOSTE (1 bank): "+fmtD20(atk)+" vs AC "+state.enemy.ac;
