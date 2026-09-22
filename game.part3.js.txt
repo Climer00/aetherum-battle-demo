@@ -1,13 +1,34 @@
-const atk=roll("1d20+"+(state.hero.atkBonus+hitB));const ac=state.enemy.ac;
+if(totalAp()<cost){log("Need "+cost+" AP (strike"+(mod?" + "+mod.name:"")+") — have "+state.ap+" AP + "+state.bank+" bank.","warn");return;}
+if(!spendAp(cost))return;
+if(mod){removeFromHand(mod.id,mod);voice(mod.id);state.selectedMod=null;}
+else voice("strike");
+resolveHeroAttack(mod);
+}
+function resolveHeroAttack(mod){
+state.phase="resolve";
+if(mod&&mod.id==="lunge")state.hero.pose="lunge";
+else if(mod&&mod.id==="spark")state.hero.pose="spark_edge";
+else if(mod&&mod.id==="precise")state.hero.pose="precise_cut";
+else if(mod&&mod.type==="maneuver")state.hero.pose="attack";
+else state.hero.pose="basic_strike";
+let hitB=(mod&&mod.hitBonus)||0;const dmgB=(mod&&mod.dmgBonus)||0;
+if(state.feintArmed){hitB+=1;state.feintArmed=false;log("Feint consumed (+1 hit).","sys");}
+if(state.shovePenalty){hitB-=1;log("Shove: −1 to hit.","warn");}
+const atk=rollAtkD20(state.hero.atkBonus+hitB);const ac=state.enemy.ac;const nat=atk.nat;
 const label=mod?(mod.type==="maneuver"?mod.name:"Strike + "+mod.name):"Strike";
-let line=label+": "+fmtD20(atk)+" vs AC "+ac;
-if(atk.total>=ac){
-const dmg=roll(state.hero.dmg);const fd=fmtDmg(dmg,dmgB);
+let line=label+": "+fmtD20(atk)+" vs AC "+ac;let dmgText="";let callout="";
+if(nat===20)callout="CRIT!";if(nat===1)callout="FUMBLE!";
+if(nat===1){line+=" — FUMBLE — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
+else if(atk.total>=ac||nat===20){
+let dmg=roll(state.hero.dmg);
+if(nat===20){const ex=d(dmg.sides);dmg.rolls.push(ex);dmg.total+=ex;dmg.sum+=ex;dmg.n+=1;log("CRIT! extra die = "+ex,"hit");}
+const fd=fmtDmg(dmg,dmgB);dmgText=fd.text;
 state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
 state.hitFlash=12;state.shake=6;state.enemy.pose="hurt";
 line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
+showDiceTheater(atk,dmgText,callout);
 if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},900);state.uiDirty=true;return;}
-}else{line+=" — MISS";log(line,"miss");}
+}else{line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
 state.animTimer=35;state.uiDirty=true;
 }
 function afterResolve(){
@@ -22,46 +43,25 @@ state.phase="enemy";
 const act=PATTERN[state.enemyPattern%PATTERN.length];
 state.enemyPattern++;state.enemyPhase=act;
 if(act==="windup"){
-state.telegraph="WIND-UP!";state.enemy.pose="windup";log("Dock Brute Wind-Up!","warn");
+state.telegraph="WIND-UP!";state.enemy.pose="windup";state.windupArmed=true;
+voice("windup");log("Dock Brute Wind-Up!","warn");
 state.riposteReady=state.bank>=1;state.phase="riposte_window";
 if(state.riposteReady){state.animTimer=0;log(">>> RIPOSTE available (1 bank) — choose Use or Skip <<<","warn");}
 else{state.animTimer=90;log("(Need bank for Riposte.)","sys");}
-}else if(act==="club"){state.telegraph=null;state.enemy.pose="club";log("Dock Brute swings Club!","sys");enemyAttack("1d8+3","Club");}
-else if(act==="heavy"){state.telegraph=null;state.enemy.pose="attack";log("Dock Brute Heavy Blow!","warn");enemyAttack("2d8+3","Heavy Blow");}
-else if(act==="shove"){state.telegraph=null;state.enemy.pose="shove";log("Dock Brute Shoves!","sys");enemyAttack("1d6+2","Shove");}
+}else if(act==="club"){state.telegraph=null;state.enemy.pose="club";voice("club");log("Dock Brute swings Club!","sys");enemyAttack("1d8+3","Club",false);}
+else if(act==="heavy"){state.telegraph=null;state.enemy.pose="attack";log("Dock Brute Heavy Blow!","warn");enemyAttack("2d8+3","Heavy Blow",false);}
+else if(act==="shove"){state.telegraph=null;state.enemy.pose="shove";voice("shove");log("Dock Brute Shoves!","sys");enemyAttack("1d6+2","Shove",true);}
 state.uiDirty=true;
 }
-function enemyAttack(dmgExpr,name){
-state.phase="resolve";
-const atk=roll("1d20+"+state.enemy.atkBonus);const ac=heroAc();
-let line=name+": "+fmtD20(atk)+" vs AC "+ac;
-if(atk.total>=ac){
-const dmg=roll(dmgExpr);const fd=fmtDmg(dmg,0);
-state.hero.hp=Math.max(0,state.hero.hp-fd.total);
-state.hitFlash=12;state.shake=8;state.hero.pose="hurt";
-line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
-if(state.hero.hp<=0){setTimeout(()=>{state.screen="lose";state.uiDirty=true;},900);state.uiDirty=true;return;}
-}else{line+=" — MISS";log(line,"miss");}
-state.animTimer=40;state._afterEnemy=true;state.uiDirty=true;
-}
-function skipRiposte(){
-if(state.phase!=="riposte_window")return;
-state.riposteReady=false;state.animTimer=0;log("Riposte skipped.","sys");state.uiDirty=true;afterEnemyOrRiposte();
-}
-function doRiposte(){
-if(state.phase!=="riposte_window")return;
-if(state.bank<1){log("No banked AP!","warn");return;}
-state.bank-=1;state.riposteReady=false;state.phase="resolve";state.telegraph=null;state.hero.pose="riposte";state.animTimer=0;
-const bonus=state.riposteSetup?3:1;const dmgB=state.riposteSetup?2:0;
-const atk=roll("1d20+"+(state.hero.atkBonus+bonus));
-let line="RIPOSTE (1 bank): "+fmtD20(atk)+" vs AC "+state.enemy.ac;
-if(atk.total>=state.enemy.ac){
-const dmg=roll(state.hero.dmg);const fd=fmtDmg(dmg,dmgB);
-state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
-state.hitFlash=14;state.shake=8;state.enemy.pose="hurt";
-line+=" — HIT — "+fd.text+" dmg";if(state.riposteSetup)line+=" (setup bonus)";log(line,"hit");
-if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},800);state.uiDirty=true;return;}
-}else{line+=" — MISS";log(line,"miss");}
-state.enemyPhase=null;state.animTimer=35;state._riposteDone=true;state._afterEnemy=true;state.uiDirty=true;
-}
-function afterEnemyOrRiposte(){
+function enemyAttack(dmgExpr,name,isShove){
+state.phase="resolve";state.windupArmed=false;state.telegraph=null;
+let ac=heroAc();
+if(state.sidestepArmed){ac+=2;state.sidestepArmed=false;log("Sidestep: −2 to their attack (consumed).","sys");}
+const atk=rollAtkD20(state.enemy.atkBonus);const nat=atk.nat;
+let callout=nat===20?"CRIT!":(nat===1?"FUMBLE!":"");
+let line=name+": "+fmtD20(atk)+" vs AC "+ac;let dmgText="";
+if(nat===1){line+=" — FUMBLE — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
+else if(atk.total>=ac||nat===20){
+let dmg=roll(dmgExpr);
+if(nat===20){const ex=d(dmg.sides);dmg.rolls.push(ex);dmg.total+=ex;dmg.sum+=ex;dmg.n+=1;}
+const fd=fmtDmg(dmg,0);dmgText=fd.text;
