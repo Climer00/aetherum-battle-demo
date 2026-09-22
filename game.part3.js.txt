@@ -13,7 +13,7 @@ state.animTimer=35;state.uiDirty=true;
 function afterResolve(){
 state.enemy.pose="idle";state.hero.pose="idle";
 if(state.enemy.hp<=0||state.hero.hp<=0)return;
-if(state.phase==="resolve"){if(state.ap>0){state.phase="player";log("AP left: "+state.ap,"sys");}else endPlayerTurn();}
+if(state.phase==="resolve"){if(totalAp()>0){state.phase="player";log("AP/bank left: "+state.ap+" AP + "+state.bank+" bank.","sys");}else endPlayerTurn();}
 state.uiDirty=true;
 }
 const PATTERN=["club","windup","club","windup","shove","club","windup"];
