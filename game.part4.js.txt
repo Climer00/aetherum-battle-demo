@@ -1,0 +1,47 @@
+state.enemy.pose="idle";state.hero.pose="idle";state.telegraph=null;
+if(state.enemy.hp<=0||state.hero.hp<=0)return;
+if(state._riposteDone){state._riposteDone=false;state._afterEnemy=false;startPlayerTurn(false);return;}
+if(state.enemyPhase==="windup"){state.enemyPhase="heavy";state.enemy.pose="heavy_blow";log("Heavy Blow lands!","warn");enemyAttack("2d8+3","Heavy Blow");return;}
+if(state._afterEnemy){state._afterEnemy=false;startPlayerTurn(false);}
+state.uiDirty=true;
+}
+function syncUI(){
+if(!state.uiDirty)return;state.uiDirty=false;
+const fighting=state.screen==="fight";const player=fighting&&state.phase==="player";const ripWin=fighting&&state.phase==="riposte_window";
+if(state.hero){
+el.ap.textContent=state.ap+"/5";el.bank.textContent=state.bank+"/4";
+el.ac.textContent=String(heroAc());el.turn.textContent=String(state.turn);
+el.riposte.textContent=state.riposteSetup?"Setup ON":"basic";
+el.mod.textContent=state.selectedMod?cardById(state.selectedMod).name:"none";
+}else{el.ap.textContent="—";el.bank.textContent="—";el.ac.textContent="—";el.turn.textContent="—";el.riposte.textContent="—";el.mod.textContent="none";}
+el.log.innerHTML="";
+state.log.forEach(entry=>{const div=document.createElement("div");div.className="line "+(entry.cls||"sys");div.textContent=entry.text;el.log.appendChild(div);});
+el.log.scrollTop=el.log.scrollHeight;
+if(state.screen==="title"){el.overlay.className="";el.overlay.textContent="Start Fight";}
+else if(state.screen==="win"){el.overlay.className="";el.overlay.textContent="VICTORY";}
+else if(state.screen==="lose"){el.overlay.className="lose";el.overlay.textContent="DEFEAT";}
+else if(state.telegraph){el.overlay.className="";el.overlay.textContent=state.telegraph;}
+else{el.overlay.className="hidden";el.overlay.textContent="";}
+el.btnFight.classList.toggle("hidden",fighting||state.screen==="win"||state.screen==="lose");
+el.btnRestart.classList.toggle("hidden",state.screen!=="win"&&state.screen!=="lose");
+el.btnStrike.disabled=!player;el.btnEnd.disabled=!player;
+el.btnRiposte.classList.toggle("hidden",!ripWin);
+el.btnRiposte.disabled=!(ripWin&&state.bank>=1);
+el.btnRiposte.textContent=state.bank>=1?"Riposte (1 Bank)":"Riposte (no bank)";
+el.handHint.textContent=player?(state.selectedMod?" · mod: "+cardById(state.selectedMod).name:" · card or Strike"):(ripWin?" · Wind-Up!":"");
+el.hand.innerHTML="";
+DEFAULT_HAND.forEach(id=>{
+const c=cardById(id);const inHand=state.inHand.has(id);const onceGone=state.discardedOnce.has(id);const sel=state.selectedMod===id;
+const btn=document.createElement("button");btn.type="button";
+btn.className="card"+(sel?" selected":"")+(onceGone?" once-gone":"");
+btn.disabled=!player||!inHand;
+const onceBadge=c.encounterOnce?'\u003cspan class="badge-once">'+(onceGone?"USED":"ONCE")+"\u003c/span>":"";
+btn.innerHTML='\u003cdiv class="cname">'+c.name+onceBadge+"\u003c/div>"+'\u003cdiv class="cmeta">'+c.cost+" AP · "+c.type+"\u003c/div>"+'\u003cdiv class="ctype">'+(inHand?"in hand":(onceGone?"once-used":"next turn"))+"\u003c/div>"+'\u003cdiv class="cdesc">'+c.desc+"\u003c/div>";
+btn.addEventListener("click",()=>playCard(id));el.hand.appendChild(btn);
+});
+}
+el.btnFight.addEventListener("click",()=>initFight());
+el.btnRestart.addEventListener("click",()=>initFight());
+el.btnStrike.addEventListener("click",()=>doBasicStrike());
+el.btnEnd.addEventListener("click",()=>endPlayerTurn());
+el.btnRiposte.addEventListener("click",()=>doRiposte());
