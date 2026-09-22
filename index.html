@@ -1,16 +1,50 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Aetherum Battle Demo - Conductor Duelist vs Dock Brute</title>
-<link rel="stylesheet" href="style.css"/>
-</head><body>
-<div id="wrap"><canvas id="c" width="256" height="224"></canvas></div>
-<script>
-(async()=>{
-  const b64 = await fetch("game.gz.b64").then(r=>{if(!r.ok)throw new Error(r.status);return r.text()});
-  const bin=Uint8Array.from(atob(b64.trim()),c=>c.charCodeAt(0));
-  const code=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
-  (0,eval)(code);
-})().catch(e=>{document.body.textContent="Boot failed: "+e;});
-</script>
-</body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Aetherum Battle Demo — Conductor Duelist vs Dock Brute</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div id="app">
+    <header id="titleBar" class="panel">
+      <h1>Aetherum Battle Demo</h1>
+      <p>Conductor Duelist vs Dock Brute · NES sprites + crisp UI</p>
+    </header>
+
+    <div id="stage">
+      <canvas id="c" width="256" height="224" aria-label="Battle sprites"></canvas>
+      <div id="overlayMsg" class="hidden"></div>
+    </div>
+
+    <section id="status" class="panel" aria-live="polite">
+      <div class="stat"><span class="lbl">AP</span> <span id="statAp">—</span></div>
+      <div class="stat"><span class="lbl">Bank</span> <span id="statBank">—</span></div>
+      <div class="stat"><span class="lbl">AC</span> <span id="statAc">—</span></div>
+      <div class="stat"><span class="lbl">Turn</span> <span id="statTurn">—</span></div>
+      <div class="stat" id="statRiposteWrap"><span class="lbl">Riposte</span> <span id="statRiposte">—</span></div>
+      <div class="stat" id="statModWrap"><span class="lbl">Mod</span> <span id="statMod">none</span></div>
+    </section>
+
+    <section id="logPanel" class="panel">
+      <h2>Battle Log</h2>
+      <div id="log" role="log"></div>
+    </section>
+
+    <section id="actions" class="panel">
+      <button type="button" id="btnFight" class="btn primary">Start Fight</button>
+      <button type="button" id="btnStrike" class="btn" disabled>Strike 1AP</button>
+      <button type="button" id="btnEnd" class="btn" disabled>End Turn</button>
+      <button type="button" id="btnRiposte" class="btn danger hidden" disabled>Riposte (1 Bank)</button>
+      <button type="button" id="btnRestart" class="btn primary hidden">Restart</button>
+    </section>
+
+    <section id="handPanel" class="panel">
+      <h2>Hand <span id="handHint" class="hint"></span></h2>
+      <div id="hand" class="hand"></div>
+    </section>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
