@@ -275,3 +275,86 @@ canvas#c {
 }
 .riposteAskBtns { display: flex; gap: 10px; }
 #riposteAsk .btn { pointer-events: auto; min-width: 88px; }
+
+/* Tabletop pack: dice theater, DM voice, chips, peek sheet */
+#diceTheater {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.72);
+  color: #f0e8d0;
+  z-index: 4;
+  pointer-events: none;
+  text-align: center;
+  padding: 12px;
+}
+#diceTheater.hidden { display: none; }
+#diceTheater .dtCall {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #d4a017;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 8px rgba(212,160,23,0.5);
+}
+#diceTheater .dtD20 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #5eead4;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+#diceTheater .dtDmg {
+  font-size: 1rem;
+  color: #7dcea0;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+#log .line.dm {
+  color: #c4b5fd;
+  font-style: italic;
+}
+#chipRow, .chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 36px;
+}
+.chipBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #0c0c18;
+  border: 1px solid #c0b090;
+  border-radius: 4px;
+  padding: 2px 6px 2px 2px;
+  font-size: 11px;
+  color: #e8e0d0;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.chipBadge img {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+.chipBadge em {
+  font-style: normal;
+  font-weight: 700;
+  color: #5eead4;
+}
+#sheetPeek, .sheetPeek {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 13px;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+#sheetPeek.hidden, .sheetPeek.hidden { display: none; }
+.sheetPeek .peekHero { color: #5eead4; }
+.sheetPeek .peekEnemy { color: #e8a85c; }
+.sheetPeek b { color: #c0b090; font-weight: 700; }
