@@ -1,0 +1,62 @@
+const atk=roll("1d20+"+(state.hero.atkBonus+hitB));const ac=state.enemy.ac;
+const label=mod?(mod.type==="maneuver"?mod.name:"Strike + "+mod.name):"Strike";
+let line=label+": "+fmtD20(atk)+" vs AC "+ac;
+if(atk.total>=ac){
+const dmg=roll(state.hero.dmg);const fd=fmtDmg(dmg,dmgB);
+state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
+state.hitFlash=12;state.shake=6;state.enemy.pose="hurt";
+line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
+if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},900);state.uiDirty=true;return;}
+}else{line+=" — MISS";log(line,"miss");}
+state.animTimer=35;state.uiDirty=true;
+}
+function afterResolve(){
+state.enemy.pose="idle";state.hero.pose="idle";
+if(state.enemy.hp<=0||state.hero.hp<=0)return;
+if(state.phase==="resolve"){if(state.ap>0){state.phase="player";log("AP left: "+state.ap,"sys");}else endPlayerTurn();}
+state.uiDirty=true;
+}
+const PATTERN=["club","windup","club","windup","shove","club","windup"];
+function beginEnemyTurn(){
+state.phase="enemy";
+const act=PATTERN[state.enemyPattern%PATTERN.length];
+state.enemyPattern++;state.enemyPhase=act;
+if(act==="windup"){
+state.telegraph="WIND-UP!";state.enemy.pose="windup";log("Dock Brute Wind-Up!","warn");
+state.riposteReady=state.bank>=1;state.phase="riposte_window";state.animTimer=90;
+if(state.riposteReady)log(">>> RIPOSTE available (1 bank) <<<","warn");else log("(Need bank for Riposte.)","sys");
+}else if(act==="club"){state.telegraph=null;state.enemy.pose="club";log("Dock Brute swings Club!","sys");enemyAttack("1d8+3","Club");}
+else if(act==="heavy"){state.telegraph=null;state.enemy.pose="attack";log("Dock Brute Heavy Blow!","warn");enemyAttack("2d8+3","Heavy Blow");}
+else if(act==="shove"){state.telegraph=null;state.enemy.pose="shove";log("Dock Brute Shoves!","sys");enemyAttack("1d6+2","Shove");}
+state.uiDirty=true;
+}
+function enemyAttack(dmgExpr,name){
+state.phase="resolve";
+const atk=roll("1d20+"+state.enemy.atkBonus);const ac=heroAc();
+let line=name+": "+fmtD20(atk)+" vs AC "+ac;
+if(atk.total>=ac){
+const dmg=roll(dmgExpr);const fd=fmtDmg(dmg,0);
+state.hero.hp=Math.max(0,state.hero.hp-fd.total);
+state.hitFlash=12;state.shake=8;state.hero.pose="hurt";
+line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
+if(state.hero.hp<=0){setTimeout(()=>{state.screen="lose";state.uiDirty=true;},900);state.uiDirty=true;return;}
+}else{line+=" — MISS";log(line,"miss");}
+state.animTimer=40;state._afterEnemy=true;state.uiDirty=true;
+}
+function doRiposte(){
+if(state.phase!=="riposte_window")return;
+if(state.bank<1){log("No banked AP!","warn");return;}
+state.bank-=1;state.riposteReady=false;state.phase="resolve";state.telegraph=null;state.hero.pose="riposte";
+const bonus=state.riposteSetup?3:1;const dmgB=state.riposteSetup?2:0;
+const atk=roll("1d20+"+(state.hero.atkBonus+bonus));
+let line="RIPOSTE (1 bank): "+fmtD20(atk)+" vs AC "+state.enemy.ac;
+if(atk.total>=state.enemy.ac){
+const dmg=roll(state.hero.dmg);const fd=fmtDmg(dmg,dmgB);
+state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
+state.hitFlash=14;state.shake=8;state.enemy.pose="hurt";
+line+=" — HIT — "+fd.text+" dmg";if(state.riposteSetup)line+=" (setup bonus)";log(line,"hit");
+if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},800);state.uiDirty=true;return;}
+}else{line+=" — MISS";log(line,"miss");}
+state.enemyPhase=null;state.animTimer=35;state._riposteDone=true;state._afterEnemy=true;state.uiDirty=true;
+}
+function afterEnemyOrRiposte(){
