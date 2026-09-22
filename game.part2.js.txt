@@ -8,10 +8,11 @@ state.uiDirty=true;
 function totalAp(){return state.ap+state.bank;}
 function spendAp(n){
 if(totalAp()<n)return false;
-const fromAp=Math.min(state.ap,n);
+const fromBank=Math.min(state.bank,n);
+state.bank-=fromBank;
+const fromAp=n-fromBank;
 state.ap-=fromAp;
-const fromBank=n-fromAp;
-if(fromBank>0){state.bank-=fromBank;log("Spent "+fromAp+" AP + "+fromBank+" bank (AP "+state.ap+"/5, bank "+state.bank+"/4).","sys");}
+log("Spent "+fromBank+" bank + "+fromAp+" AP (AP "+state.ap+"/5, bank "+state.bank+"/4).","sys");
 state.uiDirty=true;return true;
 }
 function endPlayerTurn(){
