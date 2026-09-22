@@ -1,22 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Aetherum Battle Demo — Conductor Duelist vs Dock Brute</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div id="wrap"><canvas id="c" width="256" height="224"></canvas></div>
-  <script>
-(async () => {
-  const parts = ["game.p0.js", "game.p1.js", "game.p2.js"];
-  const texts = await Promise.all(parts.map(p => fetch(p).then(r => {
-    if (!r.ok) throw new Error("failed " + p + " " + r.status);
-    return r.text();
-  })));
-  (0, eval)(texts.join(""));
-})().catch(e => { document.body.textContent = "Load failed: " + e; });
-  </script>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Aetherum Battle Demo - Conductor Duelist vs Dock Brute</title>
+<link rel="stylesheet" href="style.css"/>
+</head><body>
+<div id="wrap"><canvas id="c" width="256" height="224"></canvas></div>
+<script>
+(async()=>{
+  const b64 = await fetch("game.gz.b64").then(r=>{if(!r.ok)throw new Error(r.status);return r.text()});
+  const bin=Uint8Array.from(atob(b64.trim()),c=>c.charCodeAt(0));
+  const code=await new Response(new Blob([bin]).stream().pipeThrough(new DecompressionStream("gzip"))).text();
+  (0,eval)(code);
+})().catch(e=>{document.body.textContent="Boot failed: "+e;});
+</script>
+</body></html>
