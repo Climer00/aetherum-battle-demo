@@ -44,13 +44,13 @@ idle:"duelist_idle",attack:"duelist_basic_strike",basic_strike:"duelist_basic_st
 lunge:"duelist_lunge",spark:"duelist_spark_edge",spark_edge:"duelist_spark_edge",
 guard:"duelist_guard",precise:"duelist_precise_cut",precise_cut:"duelist_precise_cut",
 feint:"duelist_feint",sidestep:"duelist_sidestep",
-riposte_setup:"duelist_riposte_setup",riposte:"duelist_riposte",hurt:"duelist_idle"
+riposte_setup:"duelist_riposte_setup",riposte:"duelist_riposte",hurt:"duelist_hurt"
 };
 return map[pose]||"duelist_idle";
 }
 function bruteSpriteKey(pose){
 const map={idle:"brute_idle",club:"brute_club",windup:"brute_windup",attack:"brute_club",
-heavy:"brute_heavy_blow",heavy_blow:"brute_heavy_blow",shove:"brute_shove",hurt:"brute_idle"};
+heavy:"brute_heavy_blow",heavy_blow:"brute_heavy_blow",shove:"brute_shove",hurt:"brute_hurt"};
 return map[pose]||"brute_idle";
 }
 function drawSprite(img,x,y,flash){
@@ -78,6 +78,9 @@ btnFight:document.getElementById("btnFight"),
 btnStrike:document.getElementById("btnStrike"),
 btnEnd:document.getElementById("btnEnd"),
 btnRiposte:document.getElementById("btnRiposte"),
+riposteAsk:document.getElementById("riposteAsk"),
+btnRiposteUse:document.getElementById("btnRiposteUse"),
+btnRiposteSkip:document.getElementById("btnRiposteSkip"),
 btnRestart:document.getElementById("btnRestart")
 };
 function fit(){
