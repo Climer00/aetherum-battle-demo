@@ -1,1 +1,1 @@
-test
+file:///workspace/aetherum-battle-demo/sprites-brute_hurt.js
