@@ -276,7 +276,6 @@ canvas#c {
 .riposteAskBtns { display: flex; gap: 10px; }
 #riposteAsk .btn { pointer-events: auto; min-width: 88px; }
 
-/* Tabletop pack: dice theater, DM voice, chips, peek sheet */
 #diceTheater {
   position: absolute;
   inset: 0;
@@ -376,3 +375,8 @@ canvas#c {
 .sheetPeek .peekHero { color: #5eead4; }
 .sheetPeek .peekEnemy { color: #e8a85c; }
 .sheetPeek b { color: #c0b090; font-weight: 700; }
+
+.coverRow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.coverRow .lbl { color:#8a8a9a; font-weight:600; font-size:13px; text-transform:uppercase; letter-spacing:0.04em; margin-right:4px; }
+.btn.coverBtn { min-height:36px; padding:6px 12px; font-size:13px; border-color:#8a8a9a; background:#12121c; }
+.btn.coverBtn.active { border-color:#e8a85c; background:#3a2a10; color:#e8a85c; }
