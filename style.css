@@ -53,7 +53,6 @@ canvas#c {
   image-rendering: crisp-edges;
   background: #000;
   display: block;
-  /* integer scale set by JS; fallback */
   width: 512px;
   height: 448px;
   max-width: 100%;
@@ -252,3 +251,27 @@ canvas#c {
   .btn { flex: 1 1 auto; }
   canvas#c { width: 100% !important; height: auto !important; }
 }
+
+#riposteAsk {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(0,0,0,0.82);
+  color: #f0e8d0;
+  z-index: 5;
+  padding: 16px;
+  text-align: center;
+}
+#riposteAsk.hidden { display: none; }
+#riposteAskText {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #e8a85c;
+}
+.riposteAskBtns { display: flex; gap: 10px; }
+#riposteAsk .btn { pointer-events: auto; min-width: 88px; }
