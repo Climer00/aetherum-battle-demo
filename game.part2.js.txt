@@ -9,9 +9,11 @@ state.initHero=hi.total;state.initEnemy=ei.total;
 log("Initiative — Hero: "+fmtD20(hi),"sys");
 log("Initiative — Brute: "+fmtD20(ei),"sys");
 if(state.initEnemy>state.initHero){
-log("Brute wins initiative.","warn");state.phase="enemy";state.uiDirty=true;
-setTimeout(()=>beginEnemyTurn(),400);
-}else{log("You win initiative.","sys");startPlayerTurn(true);}
+log("Brute wins initiative.","warn");
+showDiceTheater(hi,"","BRUTE INIT "+state.initEnemy);
+state.phase="enemy";state.uiDirty=true;
+setTimeout(()=>beginEnemyTurn(),900);
+}else{log("You win initiative.","sys");showDiceTheater(hi,"","YOU INIT "+state.initHero);startPlayerTurn(true);}
 state.uiDirty=true;
 }
 function startPlayerTurn(first){

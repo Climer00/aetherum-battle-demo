@@ -11,9 +11,8 @@ if(state.shovePenalty)chips.push({k:"chip_shove",t:"Shove"});
 el.chipRow.innerHTML="";
 chips.forEach(c=>{
 const wrap=document.createElement("span");wrap.className="chipBadge";wrap.title=c.t;
-const img=sprites[c.k];
-if(img&&(img.complete||img._ready)){const i=document.createElement("img");i.src=SPRITE_PATHS[c.k]||"";i.alt=c.t;i.width=24;i.height=24;wrap.appendChild(i);}
-else{wrap.textContent=c.t;}
+const src=SPRITE_PATHS[c.k]||"";
+if(src.indexOf("data:image")===0){const i=document.createElement("img");i.src=src;i.alt="";i.width=24;i.height=24;i.onerror=()=>i.remove();wrap.appendChild(i);}
 const lab=document.createElement("em");lab.textContent=c.t;wrap.appendChild(lab);
 el.chipRow.appendChild(wrap);
 });
@@ -25,7 +24,7 @@ if(el.diceTheater){
 const dt=state.diceTheater;
 if(dt&&dt.frames>0){
 el.diceTheater.classList.remove("hidden");
-el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div class="dtD20">d20: '+dt.d20+'</div>'+(dt.dmg?'<div class="dtDmg">'+dt.dmg+'</div>':'');
+el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div class="dtDie" aria-hidden="true"><span>'+dt.d20+'</span></div><div class="dtD20">d20 = '+dt.d20+'</div>'+(dt.dmg?'<div class="dtDmg">'+dt.dmg+'</div>':'');
 }else{el.diceTheater.classList.add("hidden");el.diceTheater.innerHTML="";}
 }
 if(state.screen==="title"){el.overlay.className="";el.overlay.textContent="Start Fight";}
