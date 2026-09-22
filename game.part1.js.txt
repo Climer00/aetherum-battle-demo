@@ -2,7 +2,7 @@
 {id:"guard",name:"Guard",cost:1,type:"defense",acBonus:2,turns:1,desc:"+2 armor until next turn"},
 {id:"precise",name:"Precise Cut",cost:1,type:"modifier",hitBonus:1,dmgBonus:0,desc:"Strike mod +1 hit"},
 {id:"feint",name:"Feint",cost:1,type:"setup",desc:"Next Strike +1 to hit (consumes)"},
-{id:"sidestep",name:"Sidestep",cost:1,type:"defense",desc:"Next attack vs you \u22122 (consumes)"},
+{id:"sidestep",name:"Sidestep",cost:1,type:"defense",desc:"Next attack vs you −2 (consumes)"},
 {id:"riposte_setup",name:"Riposte Setup",cost:1,type:"setup",desc:"Next Riposte +1 damage die"},
 {id:"press",name:"Press",cost:2,type:"maneuver",hitBonus:0,dmgBonus:3,desc:"Heavy advance +3 dmg"},
 {id:"bind",name:"Bind",cost:1,type:"modifier",hitBonus:2,dmgBonus:0,desc:"Strike mod +2 hit"},
@@ -11,9 +11,9 @@
 const CARD_VOICE={
 spark:"Aether sparks along the blade.",
 lunge:"You close the gap in a flash.",
-guard:"Steel up \u2014 hold the line.",
+guard:"Steel up — hold the line.",
 precise:"Find the seam in the armor.",
-feint:"A false opening \u2014 then the real cut.",
+feint:"A false opening — then the real cut.",
 sidestep:"Step aside; let the blow pass.",
 riposte_setup:"Blade ready for the counter.",
 strike:"A clean, practiced strike.",
@@ -23,15 +23,15 @@ windup:"The Brute coils for a crushing blow.",
 shove:"A shoulder-check into the boards."
 };
 function voice(id){const v=CARD_VOICE[id];if(v)log(v,"dm");}
-/* Cover hook: state.cover \"half\"|\"full\" \u2192 \u22121/\u22122 atk. Unused in this demo. */
-function coverMod(){if(!state.cover)return 0;return state.cover===\"full\"?-2:state.cover===\"half\"?-1:0;}
-function rollAtkD20(mod){mod=mod||0;const r=roll(\"1d20\"+\"+\"+mod);r.nat=r.rolls[0];r.total+=coverMod();return r;}
+/* Cover hook: state.cover "half"|"full" → −1/−2 atk. Unused in this demo. */
+function coverMod(){if(!state.cover)return 0;return state.cover==="full"?-2:state.cover==="half"?-1:0;}
+function rollAtkD20(mod){mod=mod||0;const r=roll("1d20+"+mod);r.nat=r.rolls[0];r.total+=coverMod();return r;}
 function showDiceTheater(atk,dmgText,callout){
 const nat=atk.nat!=null?atk.nat:atk.rolls[0];
-state.diceTheater={frames:32,d20:String(nat),dmg:dmgText||\"\",callout:callout||\"\"};
+state.diceTheater={frames:32,d20:String(nat),dmg:dmgText||"",callout:callout||""};
 state.uiDirty=true;
 }
-const DEFAULT_HAND=[\"spark\",\"lunge\",\"guard\",\"precise\",\"feint\",\"sidestep\",\"riposte_setup\"];
+const DEFAULT_HAND=["spark","lunge","guard","precise","feint","sidestep","riposte_setup"];
 function cardById(id){return CARD_POOL.find(c=>c.id===id);}
 function d(n){return 1+Math.floor(Math.random()*n);}
 function roll(expr){
@@ -42,17 +42,17 @@ const rolls=[];for(let i=0;i<n;i++)rolls.push(d(sides));
 const sum=rolls.reduce((a,b)=>a+b,0);
 return{total:sum+mod,rolls,mod,sides,n,sum,expr};
 }
-function fmtD20(r){const modStr=r.mod>=0?\"+\"+r.mod:String(r.mod);return\"d20=\"+r.rolls[0]+\" \"+modStr+\" = \"+r.total;}
+function fmtD20(r){const modStr=r.mod>=0?"+"+r.mod:String(r.mod);return"d20="+r.rolls[0]+" "+modStr+" = "+r.total;}
 function fmtDmg(r,extra){
-extra=extra||0;let s=r.n+\"d\"+r.sides;
-if(r.mod)s+=(r.mod>=0?\"+\"+r.mod:r.mod);
-s+=\" [\"+r.rolls.join(\"+\");
-if(r.mod)s+=(r.mod>=0?\"+\"+r.mod:r.mod);
-s+=\"]\";if(extra)s+=\" +\"+extra;
-const total=r.total+extra;s+=\" = \"+total;return{text:s,total};
+extra=extra||0;let s=r.n+"d"+r.sides;
+if(r.mod)s+=(r.mod>=0?"+"+r.mod:r.mod);
+s+=" ["+r.rolls.join("+");
+if(r.mod)s+=(r.mod>=0?"+"+r.mod:r.mod);
+s+="]";if(extra)s+=" +"+extra;
+const total=r.total+extra;s+=" = "+total;return{text:s,total};
 }
 const state={
-screen:\"title\",phase:\"player\",ap:5,bank:0,selectedMod:null,
+screen:"title",phase:"player",ap:5,bank:0,selectedMod:null,
 hand:[],discardedOnce:new Set(),inHand:new Set(),
 hero:null,enemy:null,log:[],
 enemyPattern:0,enemyPhase:null,telegraph:null,
@@ -63,10 +63,10 @@ initHero:0,initEnemy:0,diceTheater:null,
 feintArmed:false,sidestepArmed:false,guardTurns:0,
 shovePenalty:0,windupArmed:false,cover:null
 };
-function log(msg,cls){state.log.push({text:msg,cls:cls||\"sys\"});if(state.log.length>40)state.log.shift();state.uiDirty=true;}
+function log(msg,cls){state.log.push({text:msg,cls:cls||"sys"});if(state.log.length>40)state.log.shift();state.uiDirty=true;}
 function initFight(){
-state.screen=\"fight\";state.phase=\"player\";state.ap=5;state.bank=0;state.selectedMod=null;
+state.screen="fight";state.phase="player";state.ap=5;state.bank=0;state.selectedMod=null;
 state.discardedOnce=new Set();state.hand=DEFAULT_HAND.slice();state.inHand=new Set(state.hand);
 state.riposteSetup=false;state.riposteReady=false;state.telegraph=null;
-state.enemyPattern:0;state.enemyPhase=null;state.turn=1;state.log=[];
+state.enemyPattern=0;state.enemyPhase=null;state.turn=1;state.log=[];
 state.animTimer=0;state.hitFlash=0;state.shake=0;state._afterEnemy=false;state._riposteDone=false;
