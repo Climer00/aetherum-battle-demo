@@ -1,6 +1,3 @@
-const before=state.bank;state.bank=Math.min(4,state.bank+2);
-if(state.bank>before)log("Bank +"+(state.bank-before)+" (bank "+state.bank+"/4).","sys");
-}
 state.ap=5;
 if(state.hero.tempAcTurns>0){state.hero.tempAcTurns--;if(state.hero.tempAcTurns<=0){state.hero.tempAc=0;state.hero.ac=state.hero.baseAc;log("Guard/Sidestep fades.","sys");}}
 for(const id of DEFAULT_HAND){if(state.discardedOnce.has(id))continue;if(!state.inHand.has(id)){state.hand.push(id);state.inHand.add(id);}}
