@@ -22,19 +22,19 @@ function mk(w,h,draw){
 }
 const C={navy:"#14101c",gold:"#d4a017",cop:"#c47a3a",lt:"#e8a85c",teal:"#5eead4",cream:"#f0e8d0",red:"#c23b3b",redlt:"#e85a5a",ink:"#1a1030"};
 window.AETHERUM_SPRITES.die_d20=mk(48,48,x=>{
-  px(x,0,0,48,48,"rgba(0,0,0,0)");diamond(x,24,24,20,C.cop,C.gold,C.ink);num(x,24,24,"20",C.teal);
+  diamond(x,24,24,20,C.cop,C.gold,C.ink);
 });
 window.AETHERUM_SPRITES.die_d20_crit=mk(48,48,x=>{
-  diamond(x,24,24,20,C.gold,C.lt,C.ink);num(x,24,24,"20",C.gold);
+  diamond(x,24,24,20,C.gold,C.lt,C.ink);
 });
 window.AETHERUM_SPRITES.die_d20_fumble=mk(48,48,x=>{
-  diamond(x,24,24,20,C.red,C.redlt,C.ink);num(x,24,24,"1",C.redlt);
+  diamond(x,24,24,20,C.red,C.redlt,C.ink);
 });
 window.AETHERUM_SPRITES.die_d8=mk(40,40,x=>{
   x.beginPath();x.moveTo(20,3);x.lineTo(36,20);x.lineTo(20,37);x.lineTo(4,20);x.closePath();
   x.fillStyle=C.cop;x.fill();x.strokeStyle=C.gold;x.lineWidth=2;x.stroke();
   x.beginPath();x.moveTo(20,10);x.lineTo(30,20);x.lineTo(20,30);x.lineTo(10,20);x.closePath();
-  x.fillStyle=C.ink;x.fill();num(x,20,21,"8",C.teal);
+  x.fillStyle=C.ink;x.fill();
 });
 function d6(face){
   return mk(32,32,x=>{
