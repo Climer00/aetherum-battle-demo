@@ -26,7 +26,7 @@ const fd=fmtDmg(dmg,dmgB);dmgText=fd.text;
 state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
 state.hitFlash=12;state.shake=6;state.enemy.pose="hurt";
 line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
-showDiceTheater(atk,dmgText,callout);
+showDiceTheater(atk,dmgText,callout,dmg);
 if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},900);state.uiDirty=true;return;}
 }else{line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
 state.animTimer=35;state.uiDirty=true;

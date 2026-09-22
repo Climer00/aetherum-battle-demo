@@ -26,9 +26,13 @@ function voice(id){const v=CARD_VOICE[id];if(v)log(v,"dm");}
 /* Cover test toggle: state.cover "half"|"full" → −1/−2 on attacks vs the hero only. */
 function coverMod(){if(!state.cover)return 0;return state.cover==="full"?-2:state.cover==="half"?-1:0;}
 function rollAtkD20(mod){mod=mod||0;const r=roll("1d20+"+mod);r.nat=r.rolls[0];return r;}
-function showDiceTheater(atk,dmgText,callout){
+function showDiceTheater(atk,dmgText,callout,dmgRoll){
 const nat=atk.nat!=null?atk.nat:atk.rolls[0];
-state.diceTheater={frames:32,d20:String(nat),dmg:dmgText||"",callout:callout||""};
+state.diceTheater={
+frames:36,d20:String(nat),dmg:dmgText||"",callout:callout||"",
+nat:nat,dmgSides:dmgRoll&&dmgRoll.sides||0,
+dmgVals:dmgRoll&&dmgRoll.rolls?dmgRoll.rolls.slice():[]
+};
 state.uiDirty=true;
 }
 const DEFAULT_HAND=["spark","lunge","guard","precise","feint","sidestep","riposte_setup"];
