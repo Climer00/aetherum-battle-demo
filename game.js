@@ -2,7 +2,7 @@
 "use strict";
 async function boot(){
   const parts=[];
-  for(let i=0;i<6;i++){
+  for(let i=0;i<7;i++){
     const r=await fetch("game.part"+i+".js.txt");
     if(!r.ok) throw new Error("missing game.part"+i+".js.txt");
     parts.push(await r.text());
