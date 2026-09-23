@@ -8,8 +8,8 @@ NES Final Fantasy-style browser battle: **Conductor Duelist** (you) vs **Dock Br
 
 Prefer pinned SHAs, not `/main/`.
 
-**Current build (six chips + dice theater):**
-https://raw.githack.com/Climer00/aetherum-battle-demo/a54e3ed56166b17e304a519cf162d904e2a7d152/index.html
+**Current build (desktop desk + 5s result holds):**
+https://raw.githack.com/Climer00/aetherum-battle-demo/ffdabc190c915ad53dcdcc6939639a5f55eb281b/index.html
 
 Clone and open `index.html` (needs a local server — `game.js` fetches `game.part0.js.txt` … `game.part6.js.txt`).
 
@@ -21,7 +21,7 @@ Clone and open `index.html` (needs a local server — `game.js` fetches `game.pa
 4. Spend order is **bank first**, then turn AP. The turn does **not** auto-end while bank remains.
 5. **End Turn** moves leftover turn AP into the bank (overflow past 4 is lost).
 6. Enemy **WIND-UP!** — if bank ≥ 1 you get **Use / Skip** Riposte. Skip keeps bank and Setup. Use spends **1 bank**.
-7. Log + dice theater show the d20 vs AC and damage dice.
+7. Log + dice theater show the d20 vs AC and damage dice. Combat results **hold 5 seconds** (wall-clock, not frames) so you can read the line before the next step.
 8. Drop the Brute to 0 HP. **Restart** to rematch.
 
 ## Locked combat rules
@@ -60,8 +60,9 @@ Approved chip art wired: Guard v3, Feint v4, Sidestep, Riposte Setup v5, Wind-Up
 
 ## Tech
 
-- Canvas **256×224**, integer-scaled — background, sprites, HP bars, canvas chip stamps
-- Readable UI in system fonts via HTML overlay
+- Canvas **256×224**, integer-scaled 3×–4× for a desktop monitor (not a phone stack)
+- Readable UI in system fonts via HTML overlay — arena left, log/actions right, hand across the bottom
+- Result holds use `performance.now()` (5 seconds), so a 120 Hz display cannot rush the beat
 - Engine split across `game.part0.js.txt` … `game.part6.js.txt`; `game.js` concatenates and evals them
 - Art workflow: glance-approve new art before any repo commit
 
