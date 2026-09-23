@@ -2,17 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=1280"/>
   <title>Aetherum Battle Demo — Conductor Duelist vs Dock Brute</title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="style-dice.css"/>
+  <link rel="stylesheet" href="style-desktop.css"/>
 </head>
 <body>
   <div id="app">
     <header id="titleBar" class="panel">
       <h1>Aetherum Battle Demo</h1>
-      <p>Conductor Duelist vs Dock Brute · SNES sprites + tabletop pack</p>
+      <p>Conductor Duelist vs Dock Brute · desktop tabletop view</p>
     </header>
+    <div id="battleDesk">
+    <div id="stageCol">
     <div id="stage">
       <canvas id="c" width="256" height="224" aria-label="Battle sprites"></canvas>
       <div id="overlayMsg" class="hidden"></div>
@@ -27,6 +30,9 @@
     </div>
     <div id="chipRow" class="chipRow panel" aria-label="Status chips"></div>
     <section id="sheetPeek" class="panel sheetPeek hidden" aria-live="polite"></section>
+    </div>
+    <div id="sideCol">
+    <p id="phaseNote" class="phaseNote">Click Start Fight</p>
     <section id="status" class="panel" aria-live="polite">
       <div class="stat"><span class="lbl">AP</span> <span id="statAp">—</span></div>
       <div class="stat"><span class="lbl">Bank</span> <span id="statBank">—</span></div>
@@ -47,11 +53,13 @@
     </section>
     <section id="actions" class="panel">
       <button type="button" id="btnFight" class="btn primary">Start Fight</button>
-      <button type="button" id="btnStrike" class="btn" disabled>Strike 1AP</button>
-      <button type="button" id="btnEnd" class="btn" disabled>End Turn</button>
+      <button type="button" id="btnStrike" class="btn">Strike 1AP</button>
+      <button type="button" id="btnEnd" class="btn">End Turn</button>
       <button type="button" id="btnRiposte" class="btn danger hidden" disabled>Riposte (1 Bank)</button>
       <button type="button" id="btnRestart" class="btn primary hidden">Restart</button>
     </section>
+    </div>
+    </div>
     <section id="handPanel" class="panel">
       <h2>Hand <span id="handHint" class="hint"></span></h2>
       <div id="hand" class="hand"></div>
