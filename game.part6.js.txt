@@ -51,12 +51,12 @@ if(state.windupArmed||(state.enemy&&state.enemy.pose==="windup")){stamp("chip_wi
 function drawIdleBg(){rect(0,0,W,H,P.black);rect(0,80,W,80,P.dark);drawBrute(40,60);drawHero(160,64);}
 function tick(){
 if(state.hitFlash>0)state.hitFlash--;if(state.shake>0)state.shake--;
-if(state.diceTheater&&state.diceTheater.frames>0){state.diceTheater.frames--;if(state.diceTheater.frames===0)state.uiDirty=true;else state.uiDirty=true;}
-if(state.animTimer>0){state.animTimer--;if(state.animTimer===0){
+if(state.diceTheater&&state.diceTheater.until&&performance.now()>=state.diceTheater.until){state.diceTheater.until=0;state.uiDirty=true;}
+if(state.holdUntil&&performance.now()>=state.holdUntil){state.holdUntil=0;
 if(state.phase==="resolve"){if(state._afterEnemy||state._riposteDone)afterEnemyOrRiposte();else afterResolve();}
 else if(state.phase==="riposte_window"){state.riposteReady=false;afterEnemyOrRiposte();}
 else if(state.phase==="player"&&state.hero){state.hero.pose="idle";}
-state.uiDirty=true;}}
+state.uiDirty=true;}
 if(state.screen==="fight")drawFightSprites();else drawIdleBg();
 syncUI();requestAnimationFrame(tick);
 }

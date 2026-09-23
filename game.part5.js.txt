@@ -22,7 +22,7 @@ state.log.forEach(entry=>{const div=document.createElement("div");div.className=
 el.log.scrollTop=el.log.scrollHeight;
 if(el.diceTheater){
 const dt=state.diceTheater;
-if(dt&&dt.frames>0){
+if(dt&&theaterLive()){
 el.diceTheater.classList.remove("hidden");
 const pack=window.AETHERUM_SPRITES||{};
 const nat=dt.nat!=null?dt.nat:+dt.d20;
@@ -41,14 +41,28 @@ el.diceTheater.innerHTML='<div class="dtCall">'+(dt.callout||"")+'</div><div cla
 if(state.screen==="title"){el.overlay.className="";el.overlay.textContent="Start Fight";}
 else if(state.screen==="win"){el.overlay.className="";el.overlay.textContent="VICTORY";}
 else if(state.screen==="lose"){el.overlay.className="lose";el.overlay.textContent="DEFEAT";}
-else if(state.telegraph&&!(state.diceTheater&&state.diceTheater.frames>0)){el.overlay.className="";el.overlay.textContent=state.telegraph;}
+else if(state.telegraph&&!theaterLive()){el.overlay.className="";el.overlay.textContent=state.telegraph;}
 else{el.overlay.className="hidden";el.overlay.textContent="";}
 el.btnFight.classList.toggle("hidden",fighting||state.screen==="win"||state.screen==="lose");
 el.btnRestart.classList.toggle("hidden",state.screen!=="win"&&state.screen!=="lose");
 el.btnStrike.disabled=!player;el.btnEnd.disabled=!player;
+el.btnStrike.textContent=player&&state.selectedMod?("Strike + "+cardById(state.selectedMod).name):"Strike 1AP";
+if(el.phaseNote){
+let note="Click Start Fight";
+if(state.screen==="win")note="Victory — Restart to rematch";
+else if(state.screen==="lose")note="Defeat — Restart to rematch";
+else if(fighting){
+if(state.phase==="player")note="Your turn — play a card, Strike, or End Turn";
+else if(state.phase==="resolve")note="Hold 5 seconds — read the result";
+else if(state.phase==="riposte_window")note=state.riposteReady?"Wind-Up! Use or Skip Riposte":"Wind-Up — Heavy Blow in 5 seconds";
+else if(state.phase==="enemy")note="Brute is acting";
+else note="Battle in progress";
+}
+el.phaseNote.textContent=note;
+}
 const ask=ripWin&&state.bank>=1&&state.riposteReady;
-el.btnRiposte.classList.toggle("hidden",!ripWin||ask);
-el.btnRiposte.disabled=!(ripWin&&state.bank>=1);
+el.btnRiposte.classList.toggle("hidden",!(ripWin&&state.riposteReady)||ask);
+el.btnRiposte.disabled=!(ripWin&&state.riposteReady&&state.bank>=1);
 el.btnRiposte.textContent=state.bank>=1?"Riposte (1 Bank)":"Riposte (no bank)";
 if(el.riposteAsk){el.riposteAsk.classList.toggle("hidden",!ask);}
 el.handHint.textContent=player?(state.selectedMod?" · mod: "+cardById(state.selectedMod).name:" · card or Strike"):(ripWin?" · Wind-Up!":"");

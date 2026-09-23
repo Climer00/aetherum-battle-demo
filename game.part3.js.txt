@@ -27,9 +27,9 @@ state.enemy.hp=Math.max(0,state.enemy.hp-fd.total);
 state.hitFlash=12;state.shake=6;state.enemy.pose="hurt";
 line+=" — HIT — "+fd.text+" dmg";log(line,"hit");
 showDiceTheater(atk,dmgText,callout,dmg);
-if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},900);state.uiDirty=true;return;}
+if(state.enemy.hp<=0){setTimeout(()=>{state.screen="win";state.uiDirty=true;},5000);state.uiDirty=true;return;}
 }else{line+=" — MISS";log(line,"miss");showDiceTheater(atk,"",callout);}
-state.animTimer=35;state.uiDirty=true;
+startHold();state.uiDirty=true;
 }
 function afterResolve(){
 state.enemy.pose="idle";state.hero.pose="idle";
@@ -46,8 +46,8 @@ if(act==="windup"){
 state.telegraph="WIND-UP!";state.enemy.pose="windup";state.windupArmed=true;
 voice("windup");log("Dock Brute Wind-Up!","warn");
 state.riposteReady=state.bank>=1;state.phase="riposte_window";
-if(state.riposteReady){state.animTimer=0;log(">>> RIPOSTE available (1 bank) — choose Use or Skip <<<","warn");}
-else{state.animTimer=90;log("(Need bank for Riposte.)","sys");}
+if(state.riposteReady){state.holdUntil=0;log(">>> RIPOSTE available (1 bank) — choose Use or Skip <<<","warn");}
+else{startHold();log("(Need bank for Riposte.)","sys");}
 }else if(act==="club"){state.telegraph=null;state.enemy.pose="club";voice("club");log("Dock Brute swings Club!","sys");enemyAttack("1d8+3","Club",false);}
 else if(act==="heavy"){state.telegraph=null;state.enemy.pose="attack";log("Dock Brute Heavy Blow!","warn");enemyAttack("2d8+3","Heavy Blow",false);}
 else if(act==="shove"){state.telegraph=null;state.enemy.pose="shove";voice("shove");log("Dock Brute Shoves!","sys");enemyAttack("1d6+2","Shove",true);}
