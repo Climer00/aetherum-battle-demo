@@ -12,7 +12,7 @@ if(state.initEnemy>state.initHero){
 log("Brute wins initiative.","warn");
 showDiceTheater(hi,"","BRUTE INIT "+state.initEnemy);
 state.phase="enemy";state.uiDirty=true;
-setTimeout(()=>beginEnemyTurn(),900);
+setTimeout(()=>beginEnemyTurn(),5000);
 }else{log("You win initiative.","sys");showDiceTheater(hi,"","YOU INIT "+state.initHero);startPlayerTurn(true);}
 state.uiDirty=true;
 }
@@ -56,16 +56,16 @@ state.uiDirty=true;return;
 if(!spendAp(c.cost))return;removeFromHand(id,c);voice(c.id);
 if(c.id==="guard"){
 state.hero.pose="guard";state.hero.tempAc=2;state.guardTurns=1;
-log("Guard: +2 armor (AC "+heroAc()+").","sys");state.animTimer=Math.max(state.animTimer,28);
+log("Guard: +2 armor (AC "+heroAc()+").","sys");startHold(POSE_MS);
 }else if(c.id==="sidestep"){
 state.hero.pose="sidestep";state.sidestepArmed=true;
-log("Sidestep: next attack vs you −2.","sys");state.animTimer=Math.max(state.animTimer,28);
+log("Sidestep: next attack vs you −2.","sys");startHold(POSE_MS);
 }else if(c.id==="feint"){
 state.hero.pose="feint";state.feintArmed=true;
-log("Feint armed: next Strike +1 to hit.","sys");state.animTimer=Math.max(state.animTimer,28);
+log("Feint armed: next Strike +1 to hit.","sys");startHold(POSE_MS);
 }else if(c.id==="riposte_setup"){
 state.hero.pose="riposte_setup";state.riposteSetup=true;
-log("Riposte Setup armed (+1 dmg die on Use).","warn");state.animTimer=Math.max(state.animTimer,28);
+log("Riposte Setup armed (+1 dmg die on Use).","warn");startHold(POSE_MS);
 }else if(c.type==="maneuver"){resolveHeroAttack(c);}
 state.uiDirty=true;
 }

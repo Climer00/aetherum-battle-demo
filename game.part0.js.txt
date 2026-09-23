@@ -7,6 +7,8 @@ red:"#c23b3b",redLt:"#e85a5a",green:"#3d9e5f",skin:"#e8c4a0",brown:"#6b4423",
 brute:"#5a6a4a",bruteLt:"#8a9a6a"
 };
 const W=256,H=224;
+const HOLD_MS=5000;
+const POSE_MS=500;
 const canvas=document.getElementById("c");
 const ctx=canvas.getContext("2d");
 ctx.imageSmoothingEnabled=false;
@@ -87,11 +89,14 @@ btnRiposteSkip:document.getElementById("btnRiposteSkip"),
 btnRestart:document.getElementById("btnRestart"),
 coverNone:document.getElementById("coverNone"),
 coverHalf:document.getElementById("coverHalf"),
-coverFull:document.getElementById("coverFull")
+coverFull:document.getElementById("coverFull"),
+phaseNote:document.getElementById("phaseNote")
 };
 function fit(){
-const maxW=Math.min(window.innerWidth-24,720);
-const s=Math.max(1,Math.floor(Math.min(maxW/W,(window.innerHeight*0.45)/H)));
+const side=460;
+const availW=Math.max(768,window.innerWidth-side-64);
+const availH=Math.max(672,window.innerHeight-260);
+const s=Math.max(3,Math.min(4,Math.floor(Math.min(availW/W,availH/H))));
 canvas.style.width=(W*s)+"px";canvas.style.height=(H*s)+"px";
 }
 window.addEventListener("resize",fit);fit();

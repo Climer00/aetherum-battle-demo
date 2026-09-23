@@ -29,7 +29,7 @@ function rollAtkD20(mod){mod=mod||0;const r=roll("1d20+"+mod);r.nat=r.rolls[0];r
 function showDiceTheater(atk,dmgText,callout,dmgRoll){
 const nat=atk.nat!=null?atk.nat:atk.rolls[0];
 state.diceTheater={
-frames:36,d20:String(nat),dmg:dmgText||"",callout:callout||"",
+until:performance.now()+HOLD_MS,frames:0,d20:String(nat),dmg:dmgText||"",callout:callout||"",
 nat:nat,dmgSides:dmgRoll&&dmgRoll.sides||0,
 dmgVals:dmgRoll&&dmgRoll.rolls?dmgRoll.rolls.slice():[]
 };
@@ -61,16 +61,18 @@ hand:[],discardedOnce:new Set(),inHand:new Set(),
 hero:null,enemy:null,log:[],
 enemyPattern:0,enemyPhase:null,telegraph:null,
 riposteReady:false,riposteSetup:false,
-animTimer:0,hitFlash:0,shake:0,turn:0,
+animTimer:0,holdUntil:0,hitFlash:0,shake:0,turn:0,
 uiDirty:true,_afterEnemy:false,_riposteDone:false,
 initHero:0,initEnemy:0,diceTheater:null,
 feintArmed:false,sidestepArmed:false,guardTurns:0,
 shovePenalty:0,windupArmed:false,cover:null
 };
 function log(msg,cls){state.log.push({text:msg,cls:cls||"sys"});if(state.log.length>40)state.log.shift();state.uiDirty=true;}
+function startHold(ms){state.holdUntil=performance.now()+(typeof ms==="number"?ms:HOLD_MS);}
+function theaterLive(){const dt=state.diceTheater;if(!dt)return false;if(dt.until)return performance.now()<dt.until;return dt.frames>0;}
 function initFight(){
 state.screen="fight";state.phase="player";state.ap=5;state.bank=0;state.selectedMod=null;
 state.discardedOnce=new Set();state.hand=DEFAULT_HAND.slice();state.inHand=new Set(state.hand);
 state.riposteSetup=false;state.riposteReady=false;state.telegraph=null;
 state.enemyPattern=0;state.enemyPhase=null;state.turn=1;state.log=[];
-state.animTimer=0;state.hitFlash=0;state.shake=0;state._afterEnemy=false;state._riposteDone=false;
+state.animTimer=0;state.holdUntil=0;state.hitFlash=0;state.shake=0;state._afterEnemy=false;state._riposteDone=false;
